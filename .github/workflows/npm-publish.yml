@@ -4,8 +4,11 @@
 name: Node.js Publish
 
 on:
-  push: 
-    branches: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
       - main
 
 jobs:
