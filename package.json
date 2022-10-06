@@ -1,0 +1,16 @@
+{
+  "name": "d3-components",
+  "version": "1.0.0",
+  "description": "React D3 ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Prashul Jain",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "^18.0.21",
+    "react": "^18.2.0",
+    "typescript": "^4.8.4"
+  }
+}
