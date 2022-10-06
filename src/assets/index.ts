@@ -1,5 +1,6 @@
+import markerA from './markerA.svg';
+import markerB from './markerB.svg';
 export const asset = {
-    // This is a comment
-    markerA : require('./markerA.svg'),
-    markerB : require('./markerB.svg'),
+    markerA,
+    markerB,
 }

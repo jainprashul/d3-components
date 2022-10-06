@@ -95,7 +95,9 @@ const CalibrateMap = ({
 
     // On center prop change
     useEffect(() => {
-        setCenter(_center)
+        if(center !== _center) {
+            setCenter(_center)
+        }
     }, [_center])
 
 
