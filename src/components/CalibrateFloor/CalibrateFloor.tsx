@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import * as d3 from 'd3'
+import { asset } from '../../assets'
 
 export type Coordinates = {
     id: number | string,
@@ -55,7 +56,7 @@ const CalibrateFloor = ({
                 .attr('class', 'pointer')
                 .attr('data-id', 'A')
                 .attr('data-label', 'Marker A')
-                .attr('xlink:href', './imgs/markerA.svg')
+                .attr('xlink:href', asset.markerA)
                 .attr('height', h[size])
                 .attr('x', ax )
                 .attr('y', ay )
@@ -75,7 +76,7 @@ const CalibrateFloor = ({
                 .attr('class', 'pointer')
                 .attr('data-id', 'B')
                 .attr('data-label', 'Marker B')
-                .attr('xlink:href', './imgs/markerB.svg')
+                .attr('xlink:href', asset.markerB)
                 .attr('height', h[size])
                 .attr('x', bx )
                 .attr('y', by )

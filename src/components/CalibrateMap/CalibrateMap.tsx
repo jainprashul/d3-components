@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import GoogleMapReact from 'google-map-react'
+import { asset } from '../../assets'
 
 type Location = {
     lat: number,
@@ -103,7 +104,7 @@ const CalibrateMap = ({
     const MarkerA = ({ lat, lng }: {
         lat: number,
         lng: number
-    }) => <img src="./imgs/markerA.svg" style={{
+    }) => <img src={asset.markerA} style={{
         // transform: `translate(-${dx[size]}px, -${dy[size]}px)`,
         transform: `translate(-${48}%, -${90}%)`,
     }} height={h[size]} alt="Marker A" />
@@ -111,7 +112,7 @@ const CalibrateMap = ({
     const MarkerB = ({ lat, lng }: {
         lat: number,
         lng: number
-    }) => <img src="./imgs/markerB.svg" style={{
+    }) => <img src={asset.markerB} style={{
         transform: `translate(-${48}%, -${90}%)`,
     }} height={h[size]} alt="Marker B" />
 
