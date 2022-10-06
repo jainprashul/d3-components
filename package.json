@@ -5,11 +5,19 @@
   },
   "version": "1.0.9",
   "description": "React D3 Components",
+  "keywords": [
+    "react",
+    "d3",
+    "chart",
+    "component",
+    "visualization"
+  ],
+  "displayName": "XP D3 Components",
   "scripts": {
     "rollup": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Prashul Jain",
+  "author": "Prashul Jain <jainprashul@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.2",

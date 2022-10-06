@@ -20,6 +20,7 @@ jobs:
           node-version: 16
       - name : Install Deps
         run : npm install
+      - run : npm run rollup --if-present
       - run: npm ci
 
   publish-npm:
@@ -31,7 +32,8 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
+      # - run: npm ci
+      # - run: npm publish
+      - uses: codfish/semantic-release-action@master
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
