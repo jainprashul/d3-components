@@ -1,46 +1,46 @@
 /// <reference types="react" />
-declare type Location = {
+declare type Location$1 = {
     lat: number;
     lng: number;
     address?: string;
 };
 declare type MapData = {
-    center: Location;
+    center: Location$1;
     zoom: number;
-    markerA: Location;
-    markerB: Location;
+    markerA: Location$1;
+    markerB: Location$1;
 };
-declare type Props$2 = {
+declare type Props$3 = {
     xdim?: number;
     ydim?: number;
-    center?: Location;
+    center?: Location$1;
     zoom?: number;
     getMapData: (data: MapData) => void;
-    markerA?: Location;
-    markerB?: Location;
+    markerA?: Location$1;
+    markerB?: Location$1;
     size?: 'small' | 'medium' | 'large';
     showAddress?: boolean;
     showAddressInput?: boolean;
     showAutoComplete?: boolean;
     apiKey: string;
 };
-declare const CalibrateMap: ({ xdim, ydim, center: _center, zoom: _zoom, getMapData: getMarkers, size, showAddressInput, apiKey }: Props$2) => JSX.Element;
+declare const CalibrateMap: ({ xdim, ydim, center: _center, zoom: _zoom, getMapData: getMarkers, size, showAddressInput, apiKey }: Props$3) => JSX.Element;
 
 declare type Coordinates = {
     id: number | string;
     label?: string;
     coordinates: number[];
 };
-declare type Props$1 = {
+declare type Props$2 = {
     floorPlan: string;
     xdim?: number;
     ydim?: number;
     size?: 'small' | 'medium' | 'large';
     getCalibrationData: (data: Coordinates[]) => void;
 };
-declare const CalibrateFloor: ({ floorPlan, xdim, ydim, size, getCalibrationData }: Props$1) => JSX.Element;
+declare const CalibrateFloor: ({ floorPlan, xdim, ydim, size, getCalibrationData }: Props$2) => JSX.Element;
 
-declare type Props = {
+declare type Props$1 = {
     floorPlan: string;
     marker?: string;
     xdim?: number;
@@ -52,11 +52,27 @@ declare type Props = {
         coordinates: [number, number];
     }[];
 };
-declare const ViewPlan: ({ floorPlan, marker, xdim, ydim, size, data }: Props) => JSX.Element;
+declare const ViewPlan: ({ floorPlan, marker, xdim, ydim, size, data }: Props$1) => JSX.Element;
+
+declare type Location = {
+    lat: number;
+    lng: number;
+};
+declare type Props = {
+    center?: Location;
+    zoom?: number;
+    getCurrentLocation: (markers: Location) => void;
+    apiKey: string;
+    height?: number;
+    width?: number;
+    showAddressInput?: boolean;
+    showCurrentLocation?: boolean;
+};
+declare const GoogleMap: ({ center: _center, zoom, getCurrentLocation, apiKey, height, width, showAddressInput, showCurrentLocation }: Props) => JSX.Element;
 
 declare const imageDimensions: (file: File) => Promise<{
     width: number;
     height: number;
 }>;
 
-export { CalibrateFloor, CalibrateMap, Coordinates, MapData, ViewPlan, imageDimensions };
+export { CalibrateFloor, CalibrateMap, Coordinates, GoogleMap, Location, MapData, ViewPlan, imageDimensions };
