@@ -176,7 +176,7 @@ const CalibrateMap = ({
     }
 
     return (
-        <div style={{ height: '100%', margin: '2px' }}>
+        <div style={{ height: '100%', margin: '2px',  width: xdim }}>
             {
                 (showAddressInput && map) && (
                     <AutoCompleteBox map={map} updatePlace={updatePlace} />
