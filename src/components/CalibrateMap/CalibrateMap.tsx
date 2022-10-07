@@ -95,9 +95,11 @@ const CalibrateMap = ({
 
     // On center prop change
     useEffect(() => {
-        if(center !== _center) {
+        if(map && center !== _center) {
+            console.log('center changed', center, _center)
             setCenter(_center)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [_center])
 
 
