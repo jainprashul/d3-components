@@ -6,10 +6,7 @@ name: Node.js Publish
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - master
 
 jobs:
   build:
