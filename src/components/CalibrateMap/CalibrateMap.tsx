@@ -27,7 +27,7 @@ type Props = {
     showAddress?: boolean
     showAddressInput?: boolean
     showAutoComplete?: boolean
-    apiKey : string
+    apiKey: string
 }
 
 
@@ -95,11 +95,11 @@ const CalibrateMap = ({
 
     // On center prop change
     useEffect(() => {
-        if(map && center !== _center) {
+        if (map && _center.lat !== center.lat && _center.lng !== center.lng) {
             console.log('center changed', center, _center)
             setCenter(_center)
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [_center])
 
 
@@ -155,7 +155,7 @@ const CalibrateMap = ({
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const searchAddress = (address: string) => {
-        if(address.length < 2){
+        if (address.length < 2) {
             return
         }
         const geocoder = new map.api.Geocoder();
@@ -273,13 +273,13 @@ const CalibrateMap = ({
 
 type AutocompleteProps = {
     updatePlace: (place: any) => void
-    map : any
+    map: any
 }
 
-const AutoCompleteBox = (props : AutocompleteProps) => {
+const AutoCompleteBox = (props: AutocompleteProps) => {
     const input = useRef<HTMLInputElement>(null)
     const [address, setAddress] = useState('')
-    
+
     useEffect(() => {
         const autoComplete = new props.map.api.places.Autocomplete(input.current as HTMLInputElement, {
             types: ['address'],
@@ -297,10 +297,10 @@ const AutoCompleteBox = (props : AutocompleteProps) => {
             autoComplete.unbindAll()
             props.map.api.event.clearInstanceListeners(autoComplete)
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    
+
 
     return (
         <input type="text" id="pac-input" className="controls" style={{
@@ -309,10 +309,10 @@ const AutoCompleteBox = (props : AutocompleteProps) => {
             padding: '5px',
             boxSizing: 'border-box',
             marginBottom: '4px',
-        }} placeholder="Enter a location" 
-        value={address}
-        ref={input}
-        onChange={(e) => setAddress(e.target.value)}
+        }} placeholder="Enter a location"
+            value={address}
+            ref={input}
+            onChange={(e) => setAddress(e.target.value)}
         />
     )
 }
