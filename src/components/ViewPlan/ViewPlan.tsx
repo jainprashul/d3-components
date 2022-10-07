@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react'
 import * as d3 from 'd3'
 import './viewPlan.css'
+import {asset} from '../../assets'
+
+export type Coordinates = {
+    id: number | string,
+    label?: string,
+    coordinates: number[],
+}
 
 type Props = {
     floorPlan: string
@@ -8,16 +15,12 @@ type Props = {
     xdim?: number
     ydim?: number
     size ?: 'small' | 'medium' | 'large'
-    data:  {
-        id: number | string,
-        label?: string,
-        coordinates: [number, number],
-    }[]
+    data:  Coordinates[]
 }
 
 const ViewPlan = ({
     floorPlan,
-    marker = './imgs/pointer.svg',
+    marker = asset.pointer,
     xdim = 300,
     ydim = 300,
     size = 'small',

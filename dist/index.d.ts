@@ -26,7 +26,7 @@ declare type Props$3 = {
 };
 declare const CalibrateMap: ({ xdim, ydim, center: _center, zoom: _zoom, getMapData: getMarkers, size, showAddressInput, apiKey }: Props$3) => JSX.Element;
 
-declare type Coordinates = {
+declare type Coordinates$1 = {
     id: number | string;
     label?: string;
     coordinates: number[];
@@ -36,21 +36,22 @@ declare type Props$2 = {
     xdim?: number;
     ydim?: number;
     size?: 'small' | 'medium' | 'large';
-    getCalibrationData: (data: Coordinates[]) => void;
+    getCalibrationData: (data: Coordinates$1[]) => void;
 };
 declare const CalibrateFloor: ({ floorPlan, xdim, ydim, size, getCalibrationData }: Props$2) => JSX.Element;
 
+declare type Coordinates = {
+    id: number | string;
+    label?: string;
+    coordinates: number[];
+};
 declare type Props$1 = {
     floorPlan: string;
     marker?: string;
     xdim?: number;
     ydim?: number;
     size?: 'small' | 'medium' | 'large';
-    data: {
-        id: number | string;
-        label?: string;
-        coordinates: [number, number];
-    }[];
+    data: Coordinates[];
 };
 declare const ViewPlan: ({ floorPlan, marker, xdim, ydim, size, data }: Props$1) => JSX.Element;
 
@@ -75,4 +76,4 @@ declare const imageDimensions: (file: File) => Promise<{
     height: number;
 }>;
 
-export { CalibrateFloor, CalibrateMap, Coordinates, GoogleMap, Location, MapData, ViewPlan, imageDimensions };
+export { CalibrateFloor, CalibrateMap, Coordinates$1 as Coordinates, GoogleMap, Location, MapData, ViewPlan, imageDimensions };
