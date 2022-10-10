@@ -86,3 +86,23 @@ const App = () => {
 }
 
 ```
+
+- Google Maps
+
+```js
+import { GoogleMaps } from '@jainprashul/d3-components';
+
+const App = () => {
+    return (
+    <GoogleMaps
+      apiKey={KEY}
+      center={{
+        lat: lat,
+        lng: lng
+      }}
+      markers={markers}
+      />
+    )
+}
+
+```

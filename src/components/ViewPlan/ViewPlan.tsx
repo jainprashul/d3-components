@@ -88,6 +88,7 @@ const ViewPlan = ({
                     border: '1px solid black',
                     backgroundImage: `url(${floorPlan})`,
                     backgroundSize: 'contain',
+                    backgroundRepeat: 'round',
                 }}></svg>
         </div>
     )
