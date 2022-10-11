@@ -19,3 +19,12 @@ export const imageDimensions = (file : File) =>
     
         img.src = URL.createObjectURL(file)
 })
+
+// transform the coordinates to another coordinate system 
+export const transformCoordinates = (coordinates : Array<Array<number>>, currDim : number[], newDim : number[]) => {
+    return coordinates.map((coordinate) => {
+        return coordinate.map((value, index) => {
+            return value * (newDim[index] / currDim[index]);
+        });
+    });
+}

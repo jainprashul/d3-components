@@ -75,5 +75,6 @@ declare const imageDimensions: (file: File) => Promise<{
     width: number;
     height: number;
 }>;
+declare const transformCoordinates: (coordinates: Array<Array<number>>, currDim: number[], newDim: number[]) => number[][];
 
-export { CalibrateFloor, CalibrateMap, Coordinates$1 as Coordinates, GoogleMap, Location, MapData, ViewPlan, imageDimensions };
+export { CalibrateFloor, CalibrateMap, Coordinates$1 as Coordinates, GoogleMap, Location, MapData, ViewPlan, imageDimensions, transformCoordinates };
