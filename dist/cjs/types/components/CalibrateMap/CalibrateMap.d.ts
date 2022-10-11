@@ -14,15 +14,14 @@ declare type Props = {
     xdim?: number;
     ydim?: number;
     center?: Location;
+    setCenter: (center: Location) => void;
     zoom?: number;
     getMapData: (data: MapData) => void;
     markerA?: Location;
     markerB?: Location;
     size?: 'small' | 'medium' | 'large';
-    showAddress?: boolean;
     showAddressInput?: boolean;
-    showAutoComplete?: boolean;
     apiKey: string;
 };
-declare const CalibrateMap: ({ xdim, ydim, center: _center, zoom: _zoom, getMapData: getMarkers, size, showAddressInput, apiKey }: Props) => JSX.Element;
+declare const CalibrateMap: ({ xdim, ydim, center, setCenter, markerA: _markerA, markerB: _markerB, zoom: _zoom, getMapData: getMarkers, size, showAddressInput, apiKey }: Props) => JSX.Element;
 export default CalibrateMap;

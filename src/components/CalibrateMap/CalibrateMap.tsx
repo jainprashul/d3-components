@@ -19,14 +19,13 @@ type Props = {
     xdim?: number
     ydim?: number
     center?: Location,
+    setCenter: (center: Location) => void,
     zoom?: number,
     getMapData: (data: MapData) => void,
     markerA?: Location,
     markerB?: Location,
     size?: 'small' | 'medium' | 'large'
-    showAddress?: boolean
     showAddressInput?: boolean
-    showAutoComplete?: boolean
     apiKey: string
 }
 
@@ -34,24 +33,25 @@ type Props = {
 const CalibrateMap = ({
     xdim = 300,
     ydim = 300,
-    center: _center = {
+    center = {
         "lat": 41.73284437919054,
         "lng": -93.93040700837061
     },
-    // markerA: _markerA = {
-    //     "lat": 41.73285246071742,
-    //     "lng": -93.93053629087787,
-    // },
-    // markerB: _markerB = {
-    //     "lat": 41.73285246071742,
-    //     "lng": -93.93024258899074,
-    // },
+    setCenter,
+    markerA: _markerA = {
+        "lat": center.lat - (-0.00000227),
+        "lng": center.lng - (0.000131),
+    },
+    markerB: _markerB = {
+        "lat": center.lat - (-0.00000708),
+        "lng": center.lng - (-0.00016),
+    },
     zoom: _zoom = 20,
     getMapData: getMarkers,
     size = 'medium',
     showAddressInput = true,
     apiKey
-}: Props) => {
+}: Props): JSX.Element => {
 
     let h = {
         small: 23,
@@ -59,20 +59,14 @@ const CalibrateMap = ({
         large: 40,
     }
 
-    const [center, setCenter] = React.useState<Location>(_center)
+    // const [center, setCenter] = React.useState<Location>(_center)
     const [zoom, setZoom] = React.useState<number>(_zoom)
     const [map, setMap] = React.useState<any>(null)
 
 
-    const [markerA, setMarkerA] = React.useState<Location>({
-        "lat": center.lat - (-0.00000227),
-        "lng": center.lng - (0.000131),
-    })
+    const [markerA, setMarkerA] = React.useState<Location>(_markerA)
 
-    const [markerB, setMarkerB] = React.useState<Location>({
-        "lat": center.lat - (-0.00000708),
-        "lng": center.lng - (-0.00016),
-    })
+    const [markerB, setMarkerB] = React.useState<Location>(_markerB)
 
     useEffect(() => {
         if (map) {
@@ -94,13 +88,13 @@ const CalibrateMap = ({
     }, [center, markerA, markerB, zoom])
 
     // On center prop change
-    useEffect(() => {
-        if (map && _center.lat !== center.lat && _center.lng !== center.lng) {
-            console.log('center changed', center, _center)
-            setCenter(_center)
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [_center])
+    // useEffect(() => {
+    //     if (map && center.lat !== center.lat && center.lng !== center.lng) {
+    //         console.log('center changed', center, center)
+    //         setCenter(center)
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [center])
 
 
     const [mapDraggable, setMapDraggable] = React.useState(true);
@@ -176,7 +170,7 @@ const CalibrateMap = ({
     }
 
     return (
-        <div style={{ height: '100%', margin: '2px',  width: xdim }}>
+        <div style={{ height: '100%', margin: '2px', width: xdim }}>
             {
                 (showAddressInput && map) && (
                     <AutoCompleteBox map={map} updatePlace={updatePlace} />
