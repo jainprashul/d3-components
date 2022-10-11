@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "React D3 Components",
   "keywords": [
     "react",
@@ -15,6 +15,7 @@
   "displayName": "XP D3 Components",
   "scripts": {
     "rollup": "rollup -c",
+    "clean": "npx rimraf dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run rollup && npm publish"
   },

@@ -27,11 +27,13 @@ const ViewPlan = ({
     data
 }: Props) => {
     const canvas = React.useRef(null);
+    // on data change
     useEffect(() => {
         const svg = d3.select(canvas.current);
+        clearPointer(svg);
         addPointer(svg);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [data])
 
     let h = {
         small : 23,
@@ -73,6 +75,9 @@ const ViewPlan = ({
         })
     }
 
+    const clearPointer = (svg: d3.Selection<null, unknown, null, undefined>) => {
+        svg.selectAll('.pointer').remove();
+    }
 
     return (
         <div style={{
