@@ -10,6 +10,7 @@ declare type Props = {
     ydim?: number;
     size?: 'small' | 'medium' | 'large';
     getCalibrationData: (data: Coordinates[]) => void;
+    calbrationData?: Coordinates[];
 };
-declare const CalibrateFloor: ({ floorPlan, xdim, ydim, size, getCalibrationData }: Props) => JSX.Element;
+declare const CalibrateFloor: ({ floorPlan, xdim, ydim, size, getCalibrationData, calbrationData }: Props) => JSX.Element;
 export default CalibrateFloor;

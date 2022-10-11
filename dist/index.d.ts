@@ -37,8 +37,9 @@ declare type Props$2 = {
     ydim?: number;
     size?: 'small' | 'medium' | 'large';
     getCalibrationData: (data: Coordinates$1[]) => void;
+    calbrationData?: Coordinates$1[];
 };
-declare const CalibrateFloor: ({ floorPlan, xdim, ydim, size, getCalibrationData }: Props$2) => JSX.Element;
+declare const CalibrateFloor: ({ floorPlan, xdim, ydim, size, getCalibrationData, calbrationData }: Props$2) => JSX.Element;
 
 declare type Coordinates = {
     id: number | string;

@@ -14,6 +14,7 @@ type Props = {
     ydim?: number
     size?: 'small' | 'medium' | 'large'
     getCalibrationData: (data: Coordinates[]) => void
+    calbrationData?: Coordinates[]
 }
 
 
@@ -22,7 +23,11 @@ const CalibrateFloor = ({
     xdim = 300,
     ydim = 300,
     size = 'large',
-    getCalibrationData
+    getCalibrationData,
+    calbrationData = [
+        { id: 'A', label: 'Marker A', coordinates: [xdim / 3 , ydim/ 2] },
+        { id: 'B', label: 'Marker B', coordinates: [xdim * 2 / 3, ydim / 2] },
+    ]
 }: Props) => {
     const canvas = React.useRef(null);
 
@@ -42,25 +47,26 @@ const CalibrateFloor = ({
         medium: 27,
         large: 36,
     }
+
+    // on calibration Data change
     useEffect(() => {
         const svg = d3.select(canvas.current);
         addMarkers(svg);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [calbrationData])
 
     const addMarkers = (svg: d3.Selection<any, any, any, any>) => {
 
         if (svg.select('#A').empty()) {
-            let ax = xdim / 3, ay = ydim / 2;
             let markerA = svg.append('svg:image')
                 .attr('class', 'pointer')
-                .attr('data-id', 'A')
-                .attr('data-label', 'Marker A')
+                .attr('data-id', calbrationData[0].id)
+                .attr('data-label', calbrationData[0].label || calbrationData[0].id)
                 .attr('xlink:href', asset.markerA)
                 .attr('height', h[size])
-                .attr('x', ax )
-                .attr('y', ay )
-                .attr('id', 'A')
+                .attr('x', calbrationData[0].coordinates[0])
+                .attr('y', calbrationData[0].coordinates[1])
+                .attr('id', calbrationData[0].id)
                 .style('cursor', 'pointer')
                 .style('transform', `translate(-${dx[size]}px, -${dy[size]}px)`)
 
@@ -71,16 +77,15 @@ const CalibrateFloor = ({
 
         // add Marker B
         if (svg.select('#B').empty()) {
-            let bx = xdim * 2 / 3, by = ydim / 2;
             let markerB = svg.append('svg:image')
                 .attr('class', 'pointer')
-                .attr('data-id', 'B')
-                .attr('data-label', 'Marker B')
+                .attr('data-id', calbrationData[1].id)
+                .attr('data-label', calbrationData[1].label || calbrationData[1].id)
                 .attr('xlink:href', asset.markerB)
                 .attr('height', h[size])
-                .attr('x', bx )
-                .attr('y', by )
-                .attr('id', 'B')
+                .attr('x', calbrationData[1].coordinates[0])
+                .attr('y', calbrationData[1].coordinates[1])
+                .attr('id', calbrationData[1].id)
                 .style('cursor', 'pointer')
                 .style('transform', `translate(-${dx[size]}px, -${dy[size]}px)`)
             updateDrag(markerB, svg);
