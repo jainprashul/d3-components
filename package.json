@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "React D3 Components",
   "keywords": [
     "react",
@@ -27,6 +27,7 @@
     "@rollup/plugin-typescript": "^8.3.3",
     "@types/d3": "^7.4.0",
     "@types/google-map-react": "^2.1.7",
+    "@types/google.maps": "^3.50.4",
     "@types/react": "^18.0.0",
     "rollup": "^2.79.1",
     "rollup-plugin-dts": "^4.2.2",
@@ -46,6 +47,7 @@
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist", "src"
+    "dist",
+    "src"
   ]
 }

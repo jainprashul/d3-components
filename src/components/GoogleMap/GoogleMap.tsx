@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import GoogleMapReact from 'google-map-react'
 import { asset } from '../../assets'
+import { GmapApi } from '../../types/GmapApi'
 
 export type Location = {
     lat: number,
@@ -43,7 +44,12 @@ const GoogleMap = ({
 
     const [currentLocation, setCurrentLocation] = React.useState<null | Location>(null);
     const [center , setCenter] = React.useState<undefined | Location>(_center);
-    const [map, setMap] = React.useState<any>(null)
+    const [map, setMap] = React.useState<{
+        apiLoaded: boolean,
+        instance: google.maps.Map
+        api: GmapApi
+        ref : HTMLElement | null
+    } | null>(null)
 
 
     const [mapDraggable, setMapDraggable] = React.useState(true);
@@ -55,8 +61,8 @@ const GoogleMap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [center])
 
-    const updatePlace = (place: any) => {
-        if (place.geometry) {
+    const updatePlace = (place: google.maps.places.PlaceResult) => {
+        if (place.geometry?.location) {
             let lat = place.geometry.location.lat()
             let lng = place.geometry.location.lng()
             setCenter({
@@ -107,7 +113,7 @@ const GoogleMap = ({
                         <GoogleMapReact
                             bootstrapURLKeys={{
                                 key: apiKey,
-                                libraries: ['places']
+                                libraries: ['places'],
                             }}
                             draggable={mapDraggable}
                             center={center || currentLocation}
@@ -117,9 +123,9 @@ const GoogleMap = ({
                                 // console.log(map, mapAPI, ref)
                                 setMap({
                                     apiLoaded: true,
-                                    instance: map,
-                                    api: mapAPI,
-                                    ref
+                                    instance: map as google.maps.Map,
+                                    api: mapAPI as GmapApi,
+                                    ref: ref as HTMLElement
                                 })
                             }}
                             onChange={({ center, zoom, bounds, marginBounds }) => {
