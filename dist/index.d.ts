@@ -23,7 +23,7 @@ declare type Props$3 = {
     showAddressInput?: boolean;
     apiKey: string;
 };
-declare const CalibrateMap: ({ xdim, ydim, center, setCenter, markerA: _markerA, markerB: _markerB, zoom: _zoom, getMapData: getMarkers, size, showAddressInput, apiKey }: Props$3) => JSX.Element;
+declare const CalibrateMap: ({ xdim, ydim, center: _center, setCenter, markerA: _markerA, markerB: _markerB, zoom: _zoom, getMapData: getMarkers, size, showAddressInput, apiKey }: Props$3) => JSX.Element;
 
 declare type Coordinates$1 = {
     id: number | string;

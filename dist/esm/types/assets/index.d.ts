@@ -3,4 +3,5 @@ export declare const asset: {
     markerB: any;
     currentLocation: any;
     pointer: any;
+    pin: any;
 };
