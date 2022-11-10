@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect } from 'react'
 import GoogleMapReact from 'google-map-react'
-import { asset } from '../../assets'
+import AutoCompleteBox from '../shared/AutoCompleteBox'
 import { GmapApi } from '../../types/GmapApi'
+import { useMap } from '../shared/useMap'
 
-export type Location = {
+type Location = {
     lat: number,
     lng: number
 }
@@ -20,7 +21,7 @@ type Props = {
 }
 
 const GoogleMap = ({
-    center : _center,
+    center: _center,
     zoom = 11,
     getCurrentLocation,
     apiKey,
@@ -31,66 +32,24 @@ const GoogleMap = ({
 }: Props) => {
 
     useEffect(() => {
-        fetchCurrentLocation();
-    }, [])
-
-    useEffect(() => {
-        if(map && _center?.lat !== center?.lat && _center?.lng !== center?.lng){
-            console.log('center changed', center , _center)
+        if (map && _center?.lat !== center?.lat && _center?.lng !== center?.lng) {
+            console.log('center changed', center, _center)
             setCenter(_center)
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [_center])
 
-    const [currentLocation, setCurrentLocation] = React.useState<null | Location>(null);
-    const [center , setCenter] = React.useState<undefined | Location>(_center);
-    const [map, setMap] = React.useState<{
-        apiLoaded: boolean,
-        instance: google.maps.Map
-        api: GmapApi
-        ref : HTMLElement | null
-    } | null>(null)
 
-
-    const [mapDraggable, setMapDraggable] = React.useState(true);
+    const { map, setMap, currentLocation,
+        mapDraggable, setMapDraggable, updatePlace, 
+        center, setCenter } = useMap(_center)
 
     useEffect(() => {
-        if(center && map){
-        getCurrentLocation(center)
+        if (center && map) {
+            getCurrentLocation(center)
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [center])
-
-    const updatePlace = (place: google.maps.places.PlaceResult) => {
-        if (place.geometry?.location) {
-            let lat = place.geometry.location.lat()
-            let lng = place.geometry.location.lng()
-            setCenter({
-                lat,
-                lng
-            })
-        }
-    }
-
-    const fetchCurrentLocation = () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                console.log(position)
-                setCurrentLocation({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                })
-
-            });
-        } else {
-            console.log("Geolocation is not supported by this browser.");
-        }
-    }
-
-    const CurrentLocation = ({ lat, lng }: {
-        lat: number,
-        lng: number
-    }) => <img src={asset.currentLocation} alt="Current Location" />
 
     return (
         <div className="gmap" style={{
@@ -132,7 +91,7 @@ const GoogleMap = ({
                                 // console.log(center, zoom, bounds, marginBounds)
                                 setCenter(center)
                             }}
-                            options={{ mapTypeControl: true, controlSize: 20 }}
+                            options={{ mapTypeControl: true, controlSize: 20, clickableIcons: true }}
                             onChildMouseDown={(childKey, childProps, mouse) => {
                                 // console.log("Mouse Down",  childKey, childProps, mouse)
                                 setMapDraggable(false)
@@ -149,64 +108,12 @@ const GoogleMap = ({
                                 // console.log("Child Mouse Move", childKey, childProps, mouse)
                             }}
                         >
-                            {showCurrentLocation && <CurrentLocation lat={currentLocation.lat} lng={currentLocation.lng} />}
                         </GoogleMapReact>
-
                     </div>)
-
                 }
-
-
-
             </div>
         </div>
     )
 }
 
 export default GoogleMap
-
-
-type AutocompleteProps = {
-    updatePlace: (place: any) => void
-    map: any
-}
-
-const AutoCompleteBox = (props: AutocompleteProps) => {
-    const input = useRef<HTMLInputElement>(null)
-    const [address, setAddress] = useState('')
-
-    useEffect(() => {
-        const autoComplete = new props.map.api.places.Autocomplete(input.current as HTMLInputElement, {
-            types: ['address'],
-        })
-        autoComplete.addListener('place_changed', () => {
-            let place = autoComplete.getPlace()
-            props.updatePlace(place)
-        })
-
-        autoComplete.bindTo("bounds", props.map.instance);
-
-        console.log(props.map.api.places)
-        return () => {
-            autoComplete.unbindAll()
-            props.map.api.event.clearInstanceListeners(autoComplete)
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
-
-
-    return (
-        <input type="text" id="pac-input" className="controls" style={{
-            width: '100%',
-            height: '30px',
-            padding: '5px',
-            boxSizing: 'border-box',
-            marginBottom: '4px',
-        }} placeholder="Enter a location"
-            value={address}
-            ref={input}
-            onChange={(e) => setAddress(e.target.value)}
-        />
-    )
-}

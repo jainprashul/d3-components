@@ -21,12 +21,16 @@ export interface GmapApi {
     GeocoderStatus: google.maps.GeocoderStatus;
     GroundOverlay: google.maps.GroundOverlay;
     ImageMapType: google.maps.ImageMapType;
-    InfoWindow: google.maps.InfoWindow;
+    InfoWindow: new (opts?: google.maps.InfoWindowOptions|null) => google.maps.InfoWindow;
     KmlLayer: google.maps.KmlLayer;
     KmlLayerStatus: google.maps.KmlLayerStatus;
-    LatLng: google.maps.LatLng;
+    LatLng: new (latOrLatLngOrLatLngLiteral: number|google.maps.LatLngLiteral|
+        google.maps.LatLng,
+        lngOrNoClampNoWrap?: number|boolean|null, noClampNoWrap?: boolean) => google.maps.LatLng;
     LatLngAltitude: google.maps.LatLngAltitude;
-    LatLngBounds: google.maps.LatLngBounds;
+    LatLngBounds: new (swOrLatLngBounds?: google.maps.LatLng | null |
+        google.maps.LatLngLiteral | google.maps.LatLngBounds,
+        ne?: google.maps.LatLng | null | google.maps.LatLngLiteral) => google.maps.LatLngBounds;
     MVCArray: google.maps.MVCArray;
     MVCObject: google.maps.MVCObject;
     Map: google.maps.Map;
@@ -38,21 +42,22 @@ export interface GmapApi {
     MapsRequestError: google.maps.MapsRequestError;
     MapsServerError: google.maps.MapsServerError;
 
-    Marker: google.maps.Marker;
+    Marker: new (opts?: google.maps.MarkerOptions|null) => google.maps.Marker;
 
     MarkerImage: MarkerImage;
     MaxZoomService: google.maps.MaxZoomService;
     MaxZoomStatus: google.maps.MaxZoomStatus;
     NavigationControlStyle: NavigationControlStyle;
-    OverlayView: google.maps.OverlayView;
-    Point: google.maps.Point;
+    OverlayView: new () => google.maps.OverlayView;
+    Point: new (x: number, y: number) => google.maps.Point;
     Polygon: google.maps.Polygon;
     Polyline: google.maps.Polyline;
     Rectangle: google.maps.Rectangle;
     RenderingType: google.maps.RenderingType;
     SaveWidget: (container: Element, opts?: SaveWidgetOptions) => void;
     ScaleControlStyle: google.maps.ScaleControlStyle;
-    Size: google.maps.Size;
+    Size: new (
+        width: number, height: number, widthUnit?: string, heightUnit?: string) => google.maps.Size;
     StreetViewCoverageLayer: google.maps.StreetViewCoverageLayer;
     StreetViewPanorama: google.maps.StreetViewPanorama;
     StreetViewPreference: google.maps.StreetViewPreference;
