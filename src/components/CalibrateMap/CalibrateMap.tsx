@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect } from 'react'
 import GoogleMapReact from 'google-map-react'
 import { asset } from '../../assets'
 import AutoCompleteBox from '../shared/AutoCompleteBox'
 import { GmapApi } from '../../types/GmapApi'
+import { useMap } from '../shared/useMap'
 
 export type Location = {
     lat: number,
@@ -18,21 +19,21 @@ export type MapData = {
 }
 
 let defaultData = {
-    center: {
-        "lat": 41.73284437919054,
-        "lng": -93.93040700837061
-    },
-    zoom: 20,
-    markerA: {
-        "lat": 41.73284437919054 - (-0.00000227),
-        "lng": -93.93040700837061 - (0.000131),
-    },
-    markerB: {
-        "lat": 41.73284437919054 - (-0.00000708),
-        "lng": -93.93040700837061 - (-0.00016),
-    },
-    xdim: 300,
-    ydim: 300
+        center: {
+            "lat": 41.73284437919054,
+            "lng": -93.93040700837061
+        },
+        zoom: 20,
+        markerA: {
+            "lat": 41.73284437919054 - (-0.00000227),
+            "lng": -93.93040700837061 - (0.000131),
+        },
+        markerB: {
+            "lat": 41.73284437919054 - (-0.00000708),
+            "lng": -93.93040700837061 - (-0.00016),
+        },
+        xdim: 300,
+        ydim: 300
 }
 
 type Props = {
@@ -49,7 +50,6 @@ type Props = {
     apiKey: string
 }
 
-
 const CalibrateMap = ({
     xdim = defaultData.xdim,
     ydim = defaultData.ydim,
@@ -58,11 +58,11 @@ const CalibrateMap = ({
     markerA: _markerA = defaultData.markerA,
     markerB: _markerB = defaultData.markerB,
     zoom: _zoom = defaultData.zoom,
-    getMapData: getMarkers,
+    getMapData,
     size = 'medium',
     showAddressInput = true,
     apiKey
-}: Props): JSX.Element => {
+}: Props) => {
 
     let h = {
         small: 23,
@@ -70,25 +70,19 @@ const CalibrateMap = ({
         large: 40,
     }
 
-    // const [center, setCenter] = React.useState<Location>(_center)
-    const [zoom, setZoom] = React.useState<number>(_zoom)
-    const [map, setMap] = React.useState<{
-        apiLoaded: boolean,
-        instance: google.maps.Map
-        api: GmapApi
-        ref: HTMLElement | null
-    } | null>(null)
-
+    const { map , setMap,
+        zoom, setZoom,
+        mapDraggable , setMapDraggable , updatePlace, _generateAddress} = useMap()
 
     const [markerA, setMarkerA] = React.useState<Location>(_markerA)
-
     const [markerB, setMarkerB] = React.useState<Location>(_markerB)
-
+    
+    // send the map data to the parent component when map parameters change
     useEffect(() => {
         if (map) {
             let addr = _generateAddress(_center.lat, _center.lng)
             addr.then((address) => {
-                getMarkers({
+                getMapData({
                     center: {
                         lat: _center.lat,
                         lng: _center.lng,
@@ -102,18 +96,6 @@ const CalibrateMap = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [_center, markerA, markerB, zoom])
-
-    // On center prop change
-    // useEffect(() => {
-    //     if (map && center.lat !== center.lat && center.lng !== center.lng) {
-    //         console.log('center changed', center, center)
-    //         setCenter(center)
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [center])
-
-
-    const [mapDraggable, setMapDraggable] = React.useState(true);
 
     const MarkerA = ({ lat, lng }: {
         lat: number,
@@ -130,60 +112,7 @@ const CalibrateMap = ({
         transform: `translate(-${48}%, -${90}%)`,
     }} height={h[size]} alt="Marker B" />
 
-    const _generateAddress = (lat: number, lng: number) => {
-        const geocoder = map && new map.api.Geocoder();
-        return new Promise<string>((resolve, reject) => {
-            let address = ''
-            geocoder?.geocode({ location: { lat, lng } }, (results, status) => {
-                if (status === "OK") {
-                    console.log(results)
-                    if (results?.[0]) {
-                        address = results?.[0].formatted_address
-                        resolve(address)
-                    } else {
-                        address = 'No results found'
-                        resolve(address)
-                    }
-                } else {
-                    address = 'Geocoder failed due to: ' + status
-                    reject(address)
-                }
-            });
-        })
-    }
 
-    const updatePlace = (place: google.maps.places.PlaceResult) => {
-        if (place.geometry?.location) {
-            let lat = place.geometry.location.lat()
-            let lng = place.geometry.location.lng()
-            setCenter({
-                lat,
-                lng
-            })
-        }
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const searchAddress = (address: string) => {
-        if (address.length < 2) {
-            return
-        }
-        const geocoder = map && new map.api.Geocoder();
-        geocoder?.geocode({ address }, (results, status) => {
-            if (status === "OK") {
-                console.log(results)
-                if (results?.[0]) {
-                    let lat = results[0].geometry.location.lat()
-                    let lng = results[0].geometry.location.lng()
-                    console.log(lat, lng)
-                } else {
-                    console.log('No results found')
-                }
-            } else {
-                console.log('Geocoder failed due to: ' + status);
-            }
-        });
-    }
 
     function resetMarkers(){
         setMarkerA({
@@ -198,7 +127,7 @@ const CalibrateMap = ({
 
     return (
         <div style={{ height: ydim, margin: '2px', width: xdim }}>
-              {
+            {
                 (showAddressInput && map?.apiLoaded) && (
                     <div style={{
                         display: 'flex',
@@ -221,6 +150,7 @@ const CalibrateMap = ({
                 height: showAddressInput ? ydim - 34 : ydim,
                 border: '1px solid black',
                 marginTop: '4px',
+
             }}>
 
                 <GoogleMapReact
@@ -244,14 +174,6 @@ const CalibrateMap = ({
                     onChange={({ center, zoom, bounds, marginBounds }) => {
                         console.log(center, zoom, bounds, marginBounds)
                         setCenter(center)
-                        // setMarkerA({
-                        //     "lat": center.lat - (-0.00000227),
-                        //     "lng": center.lng - (0.000131),
-                        // })
-                        // setMarkerB({
-                        //     "lat": center.lat - (-0.00000708),
-                        //     "lng": center.lng - (-0.00016),
-                        // })
                         setZoom(zoom)
                     }}
                     options={{ mapTypeControl: true, controlSize: 20 }}
@@ -285,8 +207,8 @@ const CalibrateMap = ({
                                 ...mouse
                             })
                         }
-                    }}
-                >
+                    }}>
+
                     <MarkerA
                         key={0}
                         lat={markerA.lat}
@@ -298,7 +220,6 @@ const CalibrateMap = ({
                         lng={markerB.lng}
                     />
                 </GoogleMapReact>
-
             </div>
         </div>
     )
