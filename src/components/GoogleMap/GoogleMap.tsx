@@ -4,7 +4,7 @@ import AutoCompleteBox from '../shared/AutoCompleteBox'
 import { GmapApi } from '../../types/GmapApi'
 import { useMap } from '../shared/useMap'
 
-type Location = {
+export type Location = {
     lat: number,
     lng: number
 }

@@ -4,6 +4,7 @@ import { asset } from '../../assets'
 import AutoCompleteBox from '../shared/AutoCompleteBox'
 import { GmapApi } from '../../types/GmapApi'
 import { useMap } from '../shared/useMap'
+import '../../styles/map.css'
 
 export type Location = {
     lat: number,
@@ -150,7 +151,6 @@ const CalibrateMap = ({
                 height: showAddressInput ? ydim - 34 : ydim,
                 border: '1px solid black',
                 marginTop: '4px',
-
             }}>
 
                 <GoogleMapReact
