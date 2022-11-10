@@ -1,4 +1,5 @@
 /// <reference types="react" />
+import '../../styles/map.css';
 export declare type Location = {
     lat: number;
     lng: number;
@@ -23,5 +24,5 @@ declare type Props = {
     showAddressInput?: boolean;
     apiKey: string;
 };
-declare const CalibrateMap: ({ xdim, ydim, center: _center, setCenter, markerA: _markerA, markerB: _markerB, zoom: _zoom, getMapData: getMarkers, size, showAddressInput, apiKey }: Props) => JSX.Element;
+declare const CalibrateMap: ({ xdim, ydim, center: _center, setCenter, markerA: _markerA, markerB: _markerB, zoom: _zoom, getMapData, size, showAddressInput, apiKey }: Props) => JSX.Element;
 export default CalibrateMap;

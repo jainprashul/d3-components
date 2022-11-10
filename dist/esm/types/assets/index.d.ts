@@ -4,4 +4,5 @@ export declare const asset: {
     currentLocation: any;
     pointer: any;
     pin: any;
+    floorPlan: string;
 };
