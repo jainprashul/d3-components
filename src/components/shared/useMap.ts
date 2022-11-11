@@ -6,7 +6,7 @@ type Location = {
     lng: number
 }
 
-export const useMap = (Center? : Location, Zoom = 10 ) => {
+export const useMap = (Center? : Location, Zoom = 10 , Heading = 0) => {
     const [map, setMap] = React.useState<{
         apiLoaded: boolean,
         instance: google.maps.Map
@@ -38,19 +38,7 @@ export const useMap = (Center? : Location, Zoom = 10 ) => {
     // get the current location of the user and show it on the map
     useEffect(() => {
         fetchCurrentLocation();
-        if (currentLocation && map) {
-            new map!.api.Marker({
-                position: currentLocation,
-                map: map?.instance,
-                title: 'Current Location',
-                icon: {
-                    url: "./imgs/current.svg" ,
-                    scaledSize: new map!.api.Size(25, 25),
-                    anchor: new map!.api.Point(12.5, 12.5)
-                }
-            })
-        }
-    }, [])
+    }, []);
 
     React.useMemo(() => {
         if (currentLocation && map) {

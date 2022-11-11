@@ -7,8 +7,6 @@ import { GmapApi } from '../../types/GmapApi'
 import { useMap } from '../shared/useMap'
 import '../../styles/map.css'
 
-
-
 export type Location = {
     lat: number,
     lng: number,
@@ -22,12 +20,13 @@ export type MapData = {
     zoom: number,
     markerA: Location,
     markerB: Location,
+    heading: number,
 }
 
 let defaultData = {
     center: { lat: 62.323907, lng: -150.109291 },
     zoom: 11,
-
+    heading : 0,
     markerA: {
         // lat : 62.281819, lng: -150.287132,
         lat: 62.323907 - (0.042088),
@@ -50,8 +49,9 @@ type Props = {
     center?: Location,
     setCenter: (center: Location) => void,
     zoom?: number,
+    heading ?: number,
     getMapData: (data: MapData) => void,
-    imgSrc?: string ,
+    imgSrc?: string,
     markerA?: Location,
     markerB?: Location,
     size?: 'small' | 'medium' | 'large'
@@ -63,6 +63,7 @@ const OverlayMap = ({
     xdim = defaultData.xdim,
     ydim = defaultData.ydim,
     center = defaultData.center,
+    heading : _heading = defaultData.heading,
     setCenter,
     markerA: _markerA = defaultData.markerA,
     markerB: _markerB = defaultData.markerB,
@@ -80,7 +81,7 @@ const OverlayMap = ({
         mapDraggable, setMapDraggable,
         _generateAddress, updatePlace,
         rotateMap,
-    } = useMap(center, _zoom)
+    } = useMap(center, _zoom, _heading)
 
     const [markerA, setMarkerA] = React.useState<Location>(_markerA)
     const [markerB, setMarkerB] = React.useState<Location>(_markerB)
@@ -119,21 +120,26 @@ const OverlayMap = ({
             let rotateInterval: any;
             rotateLeftBtn.addEventListener("mousedown", () => {
                 rotateInterval = setInterval(() => {
-                    // overlay.changeAngle(-1)
                     rotateMap(-1)
                 }, 50)
             });
             rotateLeftBtn.addEventListener("mouseup", () => {
                 clearInterval(rotateInterval)
             });
+            rotateLeftBtn.addEventListener("mouseleave", () => {
+                clearInterval(rotateInterval)
+            });
 
             rotateRightBtn.addEventListener("mousedown", () => {
                 rotateInterval = setInterval(() => {
-                    // overlay.changeAngle(1)
                     rotateMap(1)
                 }, 50)
             });
             rotateRightBtn.addEventListener("mouseup", () => {
+                clearInterval(rotateInterval)
+            });
+
+            rotateRightBtn.addEventListener("mouseleave", () => {
                 clearInterval(rotateInterval)
             });
 
@@ -156,6 +162,12 @@ const OverlayMap = ({
             const overlay = new OverlayClass(bounds, imgSrc);
             overlay.setMap(map.instance);
             setOverlay(overlay)
+
+            // set the map to the heading of the overlay
+            setTimeout(() => {
+                rotateMap(1, _heading)
+            }, 500)
+            
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [map])
@@ -182,7 +194,8 @@ const OverlayMap = ({
                     },
                     zoom,
                     markerA,
-                    markerB
+                    markerB,
+                    heading : map.instance.getHeading() || 0
                 })
             })
         }
@@ -227,12 +240,14 @@ const OverlayMap = ({
                     yesIWantToUseGoogleMapApiInternals
                     onGoogleApiLoaded={({ map, maps: mapAPI, ref }) => {
                         console.log(map, mapAPI, ref)
-                        setMap({
-                            apiLoaded: true,
-                            instance: map as google.maps.Map,
-                            api: mapAPI as GmapApi,
-                            ref: ref as HTMLElement
-                        })
+                        const data ={
+                                apiLoaded: true,
+                                instance: map as google.maps.Map,
+                                api: mapAPI as GmapApi,
+                                ref: ref as HTMLElement
+                            }
+
+                        setMap(data)
                     }}
                     onChange={({ center, zoom, bounds, marginBounds }) => {
                         console.log(center, zoom, bounds, marginBounds)
@@ -246,7 +261,7 @@ const OverlayMap = ({
                             overlay.updateBounds(bounds)
                         }
                     }}
-                    options={{ controlSize: 20, mapId: "90f87356969d889c", rotateControl: true, zoomControl: true, fullscreenControl: false }}
+                    options={{ controlSize: 20, mapId: "90f87356969d889c", heading: _heading, rotateControl: true, zoomControl: true, fullscreenControl: false }}
                     onChildMouseDown={(childKey, childProps, mouse) => {
                         // console.log("Mouse Down",  childKey, childProps, mouse)
                         setMapDraggable(false)

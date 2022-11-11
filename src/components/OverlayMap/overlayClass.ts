@@ -7,9 +7,9 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
     * the bounds of the image, and a reference to the map.
     */
     return class CustomOverlay extends Overlay {
-        bounds: google.maps.LatLngBounds;
-        image: string;
-        div?: HTMLElement;
+         bounds: google.maps.LatLngBounds;
+         image: string;
+         div?: HTMLElement;
 
         constructor(bounds: google.maps.LatLngBounds, image: string) {
             super();
@@ -29,6 +29,7 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
             this.div.style.borderWidth = "0px";
             this.div.style.position = "absolute";
             this.div.style.cursor = "move";
+            this.div.style.opacity = "0.6";
             // Create the img element and attach it to the div.
             const img = document.createElement("img");
 
@@ -57,9 +58,6 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
             // coordinates of the overlay to peg it to the correct position and size.
             // To do this, we need to retrieve the projection from the overlay.
             const overlayProjection = this.getProjection();
-
-            console.log("overlayProjection", this.bounds);
-
             // Retrieve the south-west and north-east coordinates of this overlay
             // in LatLngs and convert them to pixel coordinates.
             // We'll use these coordinates to resize the div.
@@ -70,7 +68,7 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
                 this.bounds.getNorthEast()
             )!;
 
-            console.log('dir', sw, ne)
+            // console.log('dir', sw, ne)
             opts.setMarkerA({
                 lat: this.bounds.getSouthWest().lat(),
                 lng: this.bounds.getSouthWest().lng(),
@@ -181,7 +179,7 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
 
                 const A = new api.Point(-150, 150);
                 const B = new api.Point(150, -150);
-                const locationA = overlayProjection.fromDivPixelToLatLng(A)!;
+                const locationA  = overlayProjection.fromDivPixelToLatLng(A)!;
                 const locationB = overlayProjection.fromDivPixelToLatLng(B)!;
                 const bounds = new api.LatLngBounds(locationA, locationB);
                 console.log('bounds', bounds)
