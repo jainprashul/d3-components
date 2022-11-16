@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react'
-import { createOverlayClass, CustomOverlay } from './overlayClass';
-import GoogleMapReact from 'google-map-react'
-import { asset } from '../../assets'
-import AutoCompleteBox from '../shared/AutoCompleteBox'
+import React, { useEffect } from 'react';
+import GoogleMapReact from 'google-map-react';
+import AutoCompleteBox from  '../shared/AutoCompleteBox';
 import { GmapApi } from '../../types/GmapApi';
+import { createOverlayClass, CustomOverlay } from './overlayClass';
 import { MAPSTATE, useMap } from '../shared/useMap';
-import '../../styles/map.css'
+import { asset } from '../../assets'
+
 
 export type Location = {
     lat: number,
@@ -86,7 +86,7 @@ const OverlayMap = ({
     const [markerA, setMarkerA] = React.useState<Location>(_markerA)
     const [markerB, setMarkerB] = React.useState<Location>(_markerB)
 
-    const [overlay, setOverlay] = React.useState<CustomOverlay>()
+    const [overlay, setOverlay] = React.useState<CustomOverlay | null>(null)
 
     function AddOverlay(map: MAPSTATE, imgSrc: string) {
         // if any overlay exists, remove it
@@ -110,7 +110,7 @@ const OverlayMap = ({
         setOverlay(Overlay)
     }
 
-    function renderMapControls(map: MAPSTATE) {
+    const renderMapControls = (map: MAPSTATE) => {
         const toggleButton = document.createElement("button");
         toggleButton.innerHTML = '<span class="material-symbols-outlined">opacity</span>';
         toggleButton.classList.add("custom-map-control-button");
@@ -163,6 +163,11 @@ const OverlayMap = ({
             overlay?.toggleOpacity();
         });
 
+        // remove any existing controls
+        map.instance.controls.forEach((control) => {
+            control.clear()
+        })
+
         map.instance.controls[google.maps.ControlPosition.TOP_RIGHT].push(resetBtn);
         map.instance.controls[google.maps.ControlPosition.TOP_RIGHT].push(toggleButton);
         map.instance.controls[google.maps.ControlPosition.LEFT_CENTER].push(rotateLeftBtn);
@@ -171,8 +176,7 @@ const OverlayMap = ({
 
     useEffect(() => {
         if (map) {
-            renderMapControls(map)
-            AddOverlay(map, imgSrc)
+            // AddOverlay(map, imgSrc)
             // set the map to the heading of the overlay
             setTimeout(() => {
                 rotateMap(1, _heading)
@@ -181,14 +185,20 @@ const OverlayMap = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [map])
+    useEffect(() => {
+        if (map) {
+            renderMapControls(map)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [map, overlay])
 
     // if imgSrc changes, update the overlay img
     useEffect(() => {
-        if (map && overlay) {
+        if (map) {
             AddOverlay(map, imgSrc)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [imgSrc])
+    }, [imgSrc, map])
 
 
     // handles the updating the overlay when the markers are changed
