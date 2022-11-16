@@ -1,5 +1,20 @@
 import { GmapApi } from "../../types/GmapApi";
 
+export interface CustomOverlay extends google.maps.OverlayView {
+    draw(): void;
+    onAdd(): void;
+    onRemove(): void;
+    updateBounds(bounds: google.maps.LatLngBounds): void;
+    hide(): void;
+    rotate (angle: number): void;
+    toggleOpacity (): void;
+    changeAngle (direction? : number, delta? : number): void;
+    opacity(opacity: number): void;
+    show(): void;
+    reset(): void;
+    toggleDOM(map: google.maps.Map): void;
+}
+
 export function createOverlayClass(api: GmapApi, opts?: any) {
     const Overlay = api.OverlayView
     /**

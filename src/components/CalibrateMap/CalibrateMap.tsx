@@ -17,6 +17,7 @@ export type MapData = {
     zoom: number,
     markerA: Location,
     markerB: Location,
+    heading? : number
 }
 
 let defaultData = {
@@ -43,6 +44,7 @@ type Props = {
     center?: Location,
     setCenter: (center: Location) => void,
     zoom?: number,
+    heading ?: number,
     getMapData: (data: MapData) => void,
     markerA?: Location,
     markerB?: Location,
@@ -55,6 +57,7 @@ const CalibrateMap = ({
     xdim = defaultData.xdim,
     ydim = defaultData.ydim,
     center: _center = defaultData.center,
+    heading = 0,
     setCenter,
     markerA: _markerA = defaultData.markerA,
     markerB: _markerB = defaultData.markerB,
@@ -73,7 +76,7 @@ const CalibrateMap = ({
 
     const { map , setMap,
         zoom, setZoom,
-        mapDraggable , setMapDraggable , updatePlace, _generateAddress} = useMap()
+        mapDraggable , setMapDraggable , updatePlace, _generateAddress} = useMap(_center, _zoom, heading)
 
     const [markerA, setMarkerA] = React.useState<Location>(_markerA)
     const [markerB, setMarkerB] = React.useState<Location>(_markerB)

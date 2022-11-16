@@ -4,7 +4,6 @@ import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
 import postcss from "rollup-plugin-postcss";
 import image from 'rollup-plugin-img';
-import css from "rollup-plugin-import-css";
 
 //NEW
 import { terser } from "rollup-plugin-terser";
@@ -36,7 +35,7 @@ export default [
             commonjs(),
             typescript({ tsconfig: "./tsconfig.json" }),
             postcss(),
-            css({ output: 'dist/bundle.css' }),
+            // css({ output: 'dist/bundle.css' }),
 
             // NEW
             terser(),

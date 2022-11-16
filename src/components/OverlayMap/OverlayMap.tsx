@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react'
-import { createOverlayClass } from './overlayClass';
+import { createOverlayClass, CustomOverlay } from './overlayClass';
 import GoogleMapReact from 'google-map-react'
 import { asset } from '../../assets'
 import AutoCompleteBox from '../shared/AutoCompleteBox'
-import { GmapApi } from '../../types/GmapApi'
-import { useMap } from '../shared/useMap'
+import { GmapApi } from '../../types/GmapApi';
+import { MAPSTATE, useMap } from '../shared/useMap';
 import '../../styles/map.css'
 
 export type Location = {
@@ -20,13 +20,13 @@ export type MapData = {
     zoom: number,
     markerA: Location,
     markerB: Location,
-    heading: number,
+    heading?: number,
 }
 
 let defaultData = {
     center: { lat: 62.323907, lng: -150.109291 },
     zoom: 11,
-    heading : 0,
+    heading: 0,
     markerA: {
         // lat : 62.281819, lng: -150.287132,
         lat: 62.323907 - (0.042088),
@@ -49,7 +49,7 @@ type Props = {
     center?: Location,
     setCenter: (center: Location) => void,
     zoom?: number,
-    heading ?: number,
+    heading?: number,
     getMapData: (data: MapData) => void,
     imgSrc?: string,
     markerA?: Location,
@@ -63,7 +63,7 @@ const OverlayMap = ({
     xdim = defaultData.xdim,
     ydim = defaultData.ydim,
     center = defaultData.center,
-    heading : _heading = defaultData.heading,
+    heading: _heading = defaultData.heading,
     setCenter,
     markerA: _markerA = defaultData.markerA,
     markerB: _markerB = defaultData.markerB,
@@ -86,91 +86,110 @@ const OverlayMap = ({
     const [markerA, setMarkerA] = React.useState<Location>(_markerA)
     const [markerB, setMarkerB] = React.useState<Location>(_markerB)
 
-    const [overlay, setOverlay] = React.useState<any>(null)
+    const [overlay, setOverlay] = React.useState<CustomOverlay>()
+
+    function AddOverlay(map: MAPSTATE, imgSrc: string) {
+        // if any overlay exists, remove it
+        if (overlay) {
+            overlay.setMap(null)
+        }
+
+        let bounds = new map.api.LatLngBounds(
+            new map.api.LatLng(markerA.lat, markerA.lng),
+            new map.api.LatLng(markerB.lat, markerB.lng),
+        )
+
+        // set an overlay which can be used to place img which can be dragged , scaled and rotated
+        const OverlayClass = createOverlayClass(map!.api, {
+            setMarkerA,
+            setMarkerB,
+        })
+
+        const Overlay = new OverlayClass(bounds, imgSrc);
+        Overlay.setMap(map.instance);
+        setOverlay(Overlay)
+    }
+
+    function renderMapControls(map: MAPSTATE) {
+        const toggleButton = document.createElement("button");
+        toggleButton.innerHTML = '<span class="material-symbols-outlined">opacity</span>';
+        toggleButton.classList.add("custom-map-control-button");
+
+        const resetBtn = document.createElement("button");
+        resetBtn.innerHTML = '<span class="material-symbols-outlined">lock_reset</span>';
+        resetBtn.classList.add("custom-map-control-button");
+
+        const rotateLeftBtn = document.createElement("button");
+        rotateLeftBtn.innerHTML = '<span class="material-symbols-outlined">rotate_left</span>';;
+        rotateLeftBtn.classList.add("custom-map-control-button");
+
+        const rotateRightBtn = document.createElement("button");
+        rotateRightBtn.innerHTML = '<span class="material-symbols-outlined">rotate_right</span>';;
+        rotateRightBtn.classList.add("custom-map-control-button");
+
+        // reset button
+        resetBtn.addEventListener("click", () => {
+            overlay?.reset();
+        });
+
+        // click and hold to rotate
+        let rotateInterval: any;
+        rotateLeftBtn.addEventListener("mousedown", () => {
+            rotateInterval = setInterval(() => {
+                rotateMap(-1)
+            }, 50)
+        });
+        rotateLeftBtn.addEventListener("mouseup", () => {
+            clearInterval(rotateInterval)
+        });
+        rotateLeftBtn.addEventListener("mouseleave", () => {
+            clearInterval(rotateInterval)
+        });
+
+        rotateRightBtn.addEventListener("mousedown", () => {
+            rotateInterval = setInterval(() => {
+                rotateMap(1)
+            }, 50)
+        });
+        rotateRightBtn.addEventListener("mouseup", () => {
+            clearInterval(rotateInterval)
+        });
+
+        rotateRightBtn.addEventListener("mouseleave", () => {
+            clearInterval(rotateInterval)
+        });
+
+        toggleButton.addEventListener("click", () => {
+            overlay?.toggleOpacity();
+        });
+
+        map.instance.controls[google.maps.ControlPosition.TOP_RIGHT].push(resetBtn);
+        map.instance.controls[google.maps.ControlPosition.TOP_RIGHT].push(toggleButton);
+        map.instance.controls[google.maps.ControlPosition.LEFT_CENTER].push(rotateLeftBtn);
+        map.instance.controls[google.maps.ControlPosition.RIGHT_CENTER].push(rotateRightBtn);
+    }
 
     useEffect(() => {
         if (map) {
-            const OverlayClass = createOverlayClass(map.api, {
-                setMarkerA,
-                setMarkerB,
-            })
-
-            const toggleButton = document.createElement("button");
-            toggleButton.innerHTML = '<span class="material-symbols-outlined">opacity</span>';
-            toggleButton.classList.add("custom-map-control-button");
-
-            const resetBtn = document.createElement("button");
-            resetBtn.innerHTML = '<span class="material-symbols-outlined">lock_reset</span>';
-            resetBtn.classList.add("custom-map-control-button");
-
-            const rotateLeftBtn = document.createElement("button");
-            rotateLeftBtn.innerHTML = '<span class="material-symbols-outlined">rotate_left</span>';;
-            rotateLeftBtn.classList.add("custom-map-control-button");
-
-            const rotateRightBtn = document.createElement("button");
-            rotateRightBtn.innerHTML = '<span class="material-symbols-outlined">rotate_right</span>';;
-            rotateRightBtn.classList.add("custom-map-control-button");
-
-            // reset button
-            resetBtn.addEventListener("click", () => {
-                overlay.reset();
-            });
-
-            // click and hold to rotate
-            let rotateInterval: any;
-            rotateLeftBtn.addEventListener("mousedown", () => {
-                rotateInterval = setInterval(() => {
-                    rotateMap(-1)
-                }, 50)
-            });
-            rotateLeftBtn.addEventListener("mouseup", () => {
-                clearInterval(rotateInterval)
-            });
-            rotateLeftBtn.addEventListener("mouseleave", () => {
-                clearInterval(rotateInterval)
-            });
-
-            rotateRightBtn.addEventListener("mousedown", () => {
-                rotateInterval = setInterval(() => {
-                    rotateMap(1)
-                }, 50)
-            });
-            rotateRightBtn.addEventListener("mouseup", () => {
-                clearInterval(rotateInterval)
-            });
-
-            rotateRightBtn.addEventListener("mouseleave", () => {
-                clearInterval(rotateInterval)
-            });
-
-            toggleButton.addEventListener("click", () => {
-                overlay.toggleOpacity();
-            });
-
-            map.instance.controls[google.maps.ControlPosition.TOP_RIGHT].push(resetBtn);
-            map.instance.controls[google.maps.ControlPosition.TOP_RIGHT].push(toggleButton);
-            map.instance.controls[google.maps.ControlPosition.LEFT_CENTER].push(rotateLeftBtn);
-            map.instance.controls[google.maps.ControlPosition.RIGHT_CENTER].push(rotateRightBtn);
-
-            let bounds = new map.api.LatLngBounds(
-                new map.api.LatLng(markerA.lat, markerA.lng),
-                new map.api.LatLng(markerB.lat, markerB.lng),
-            )
-
-            console.log('bounds', bounds)
-            // set an overlay which can be used to place img which can be dragged , scaled and rotated
-            const overlay = new OverlayClass(bounds, imgSrc);
-            overlay.setMap(map.instance);
-            setOverlay(overlay)
-
+            renderMapControls(map)
+            AddOverlay(map, imgSrc)
             // set the map to the heading of the overlay
             setTimeout(() => {
                 rotateMap(1, _heading)
             }, 500)
-            
+
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [map])
+
+    // if imgSrc changes, update the overlay img
+    useEffect(() => {
+        if (map && overlay) {
+            AddOverlay(map, imgSrc)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [imgSrc])
+
 
     // handles the updating the overlay when the markers are changed
     useEffect(() => {
@@ -195,7 +214,7 @@ const OverlayMap = ({
                     zoom,
                     markerA,
                     markerB,
-                    heading : map.instance.getHeading() || 0
+                    heading: map.instance.getHeading() || 0
                 })
             })
         }
@@ -240,12 +259,12 @@ const OverlayMap = ({
                     yesIWantToUseGoogleMapApiInternals
                     onGoogleApiLoaded={({ map, maps: mapAPI, ref }) => {
                         console.log(map, mapAPI, ref)
-                        const data ={
-                                apiLoaded: true,
-                                instance: map as google.maps.Map,
-                                api: mapAPI as GmapApi,
-                                ref: ref as HTMLElement
-                            }
+                        const data = {
+                            apiLoaded: true,
+                            instance: map as google.maps.Map,
+                            api: mapAPI as GmapApi,
+                            ref: ref as HTMLElement
+                        }
 
                         setMap(data)
                     }}
@@ -258,7 +277,7 @@ const OverlayMap = ({
                                 new map.api.LatLng(markerA.lat, markerA.lng),
                                 new map.api.LatLng(markerB.lat, markerB.lng)
                             )
-                            overlay.updateBounds(bounds)
+                            overlay?.updateBounds(bounds)
                         }
                     }}
                     options={{ controlSize: 20, mapId: "90f87356969d889c", heading: _heading, rotateControl: true, zoomControl: true, fullscreenControl: false }}
