@@ -1,23 +1,27 @@
 import { GmapApi } from "../../types/GmapApi";
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
+import { asset } from "../../assets";
 
 type Location = {
     lat: number,
     lng: number
 }
 
-export const useMap = (Center? : Location, Zoom = 10 , Heading = 0) => {
-    const [map, setMap] = React.useState<{
-        apiLoaded: boolean,
-        instance: google.maps.Map
-        api: GmapApi
-        ref: HTMLElement | null
-    } | null>(null)
+export type MAPSTATE = {
+    apiLoaded: boolean,
+    instance: google.maps.Map
+    api: GmapApi
+    ref: HTMLElement | null
+}
+
+export const useMap = (Center?: Location, Zoom = 10, Heading = 0) => {
+
+    const [map, setMap] = React.useState<MAPSTATE | null>(null)
 
     const [zoom, setZoom] = React.useState<number>(Zoom)
 
     const [center, setCenter] = React.useState<undefined | Location>(Center);
-    
+
     const [mapDraggable, setMapDraggable] = React.useState(true);
     const [currentLocation, setCurrentLocation] = React.useState<null | Location>(null);
 
@@ -47,7 +51,7 @@ export const useMap = (Center? : Location, Zoom = 10 , Heading = 0) => {
                 map: map?.instance,
                 title: 'Current Location',
                 icon: {
-                    url: "./imgs/current.svg" ,
+                    url: asset.currentLocation,
                     scaledSize: new map!.api.Size(25, 25),
                     anchor: new map!.api.Point(12.5, 12.5)
                 }
@@ -74,7 +78,7 @@ export const useMap = (Center? : Location, Zoom = 10 , Heading = 0) => {
         });
         infoWindow.open(map!.instance);
     }
-    
+
     const _generateAddress = (lat: number, lng: number) => {
         const geocoder = map && new map.api.Geocoder();
         return new Promise<string>((resolve, reject) => {
@@ -129,7 +133,7 @@ export const useMap = (Center? : Location, Zoom = 10 , Heading = 0) => {
         map, setMap,
         center, setCenter,
         zoom, setZoom,
-        mapDraggable, setMapDraggable, 
+        mapDraggable, setMapDraggable,
         currentLocation,
         fetchCurrentLocation,
         updatePlace,

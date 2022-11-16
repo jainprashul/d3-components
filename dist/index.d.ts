@@ -9,6 +9,7 @@ declare type MapData$1 = {
     zoom: number;
     markerA: Location$2;
     markerB: Location$2;
+    heading?: number;
 };
 declare type Props$4 = {
     xdim?: number;
@@ -16,6 +17,7 @@ declare type Props$4 = {
     center?: Location$2;
     setCenter: (center: Location$2) => void;
     zoom?: number;
+    heading?: number;
     getMapData: (data: MapData$1) => void;
     markerA?: Location$2;
     markerB?: Location$2;
@@ -23,7 +25,7 @@ declare type Props$4 = {
     showAddressInput?: boolean;
     apiKey: string;
 };
-declare const CalibrateMap: ({ xdim, ydim, center: _center, setCenter, markerA: _markerA, markerB: _markerB, zoom: _zoom, getMapData, size, showAddressInput, apiKey }: Props$4) => JSX.Element;
+declare const CalibrateMap: ({ xdim, ydim, center: _center, heading, setCenter, markerA: _markerA, markerB: _markerB, zoom: _zoom, getMapData, size, showAddressInput, apiKey }: Props$4) => JSX.Element;
 
 declare type Coordinates$1 = {
     id: number | string;
@@ -83,7 +85,7 @@ declare type MapData = {
     zoom: number;
     markerA: Location;
     markerB: Location;
-    heading: number;
+    heading?: number;
 };
 declare type Props = {
     xdim?: number;
