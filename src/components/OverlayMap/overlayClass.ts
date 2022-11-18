@@ -1,6 +1,7 @@
 import { GmapApi } from "../../types/GmapApi";
 
 export interface CustomOverlay extends google.maps.OverlayView {
+    bounds: google.maps.LatLngBounds;
     draw(): void;
     onAdd(): void;
     onRemove(): void;

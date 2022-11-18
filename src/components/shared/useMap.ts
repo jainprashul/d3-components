@@ -14,7 +14,7 @@ export type MAPSTATE = {
     ref: HTMLElement | null
 }
 
-export const useMap = (Center?: Location, Zoom = 10, Heading = 0) => {
+export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag? : boolean) => {
 
     const [map, setMap] = React.useState<MAPSTATE | null>(null)
 
@@ -22,7 +22,7 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0) => {
 
     const [center, setCenter] = React.useState<undefined | Location>(Center);
 
-    const [mapDraggable, setMapDraggable] = React.useState(true);
+    const [mapDraggable, setMapDraggable] = React.useState(mapDrag ?? true);
     const [currentLocation, setCurrentLocation] = React.useState<null | Location>(null);
 
     const fetchCurrentLocation = () => {

@@ -6,7 +6,6 @@ import { createOverlayClass, CustomOverlay } from './overlayClass';
 import { MAPSTATE, useMap } from '../shared/useMap';
 import { asset } from '../../assets'
 
-
 export type Location = {
     lat: number,
     lng: number,
@@ -57,6 +56,9 @@ type Props = {
     size?: 'small' | 'medium' | 'large'
     showAddressInput?: boolean
     apiKey: string
+    mapDraggable?: boolean
+    markerDraggable?: boolean
+    mapZoomable?: boolean
 }
 
 const OverlayMap = ({
@@ -72,6 +74,9 @@ const OverlayMap = ({
     getMapData,
     size = 'medium',
     showAddressInput = true,
+    mapDraggable: _draggable = true,
+    markerDraggable = true,
+    mapZoomable = true,
     apiKey
 }: Props) => {
 
@@ -81,7 +86,7 @@ const OverlayMap = ({
         mapDraggable, setMapDraggable,
         _generateAddress, updatePlace,
         rotateMap,
-    } = useMap(center, _zoom, _heading)
+    } = useMap(center, _zoom, _heading, _draggable)
 
     const [markerA, setMarkerA] = React.useState<Location>(_markerA)
     const [markerB, setMarkerB] = React.useState<Location>(_markerB)
@@ -111,6 +116,11 @@ const OverlayMap = ({
     }
 
     const renderMapControls = (map: MAPSTATE) => {
+        // remove any existing controls
+        map.instance.controls.forEach((control) => {
+            control.clear()
+        })
+        if (!mapDraggable) return;
         const toggleButton = document.createElement("button");
         toggleButton.innerHTML = '<span class="material-symbols-outlined">opacity</span>';
         toggleButton.classList.add("custom-map-control-button");
@@ -129,6 +139,12 @@ const OverlayMap = ({
 
         // reset button
         resetBtn.addEventListener("click", () => {
+            overlay?.reset();
+        });
+
+        // reset button on double click
+        resetBtn.addEventListener("dblclick", () => {
+            map.instance.setHeading(0);
             overlay?.reset();
         });
 
@@ -163,11 +179,6 @@ const OverlayMap = ({
             overlay?.toggleOpacity();
         });
 
-        // remove any existing controls
-        map.instance.controls.forEach((control) => {
-            control.clear()
-        })
-
         map.instance.controls[google.maps.ControlPosition.TOP_RIGHT].push(resetBtn);
         map.instance.controls[google.maps.ControlPosition.TOP_RIGHT].push(toggleButton);
         map.instance.controls[google.maps.ControlPosition.LEFT_CENTER].push(rotateLeftBtn);
@@ -176,8 +187,11 @@ const OverlayMap = ({
 
     useEffect(() => {
         if (map) {
-            // AddOverlay(map, imgSrc)
-            // set the map to the heading of the overlay
+            // enable fractional zoom
+            map.instance.setOptions({
+                isFractionalZoomEnabled: true,
+            });
+
             setTimeout(() => {
                 rotateMap(1, _heading)
             }, 500)
@@ -196,10 +210,18 @@ const OverlayMap = ({
     useEffect(() => {
         if (map) {
             AddOverlay(map, imgSrc)
+            if((!markerDraggable && !_draggable) && overlay?.bounds){
+                console.log('setting bounds', overlay.bounds);
+                // map.instance.fitBounds(overlay.bounds)
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [imgSrc, map])
+    }, [imgSrc, markerDraggable, mapDraggable, map])
 
+    useEffect(() => {
+        setMapDraggable(_draggable)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [_draggable])
 
     // handles the updating the overlay when the markers are changed
     useEffect(() => {
@@ -235,7 +257,7 @@ const OverlayMap = ({
     const MarkerA = ({ lat, lng }: {
         lat: number,
         lng: number
-    }) => <span className='marker'></span>
+    }) => <span className={markerDraggable ? `marker` : `marker hidden` }></span>
 
     return (
         <div style={{ height: '100%', margin: '2px', width: xdim }}>
@@ -290,41 +312,44 @@ const OverlayMap = ({
                             overlay?.updateBounds(bounds)
                         }
                     }}
-                    options={{ controlSize: 20, mapId: "90f87356969d889c", heading: _heading, rotateControl: true, zoomControl: true, fullscreenControl: false }}
+                    options={{ controlSize: 20, mapId: "90f87356969d889c", heading: _heading, rotateControl: true, zoomControl: _draggable, fullscreenControl: false }}
                     onChildMouseDown={(childKey, childProps, mouse) => {
+                        if (markerDraggable) {
+                            setMapDraggable(false)
+                        }
                         // console.log("Mouse Down",  childKey, childProps, mouse)
-                        setMapDraggable(false)
                     }}
                     onChildMouseUp={(childKey, childProps, mouse) => {
                         // console.log("Child Click UP", childKey, childProps, mouse)
-                        setMapDraggable(true)
+                        if (markerDraggable) {
+                            setMapDraggable(true)
+                        }
                     }}
                     onChildClick={(childKey, childProps) => {
                         console.log("Child click ", childKey, childProps)
                     }}
                     onChildMouseMove={(childKey, childProps, mouse) => {
                         // console.log("Child Mouse Move", childKey, mouse)
-
-                        // Move the Marker A
-                        if (childKey === "0") {
-                            setMarkerA({
-                                lat: mouse.lat,
-                                lng: mouse.lng,
-                                ...mouse
-                            })
-                        }
-                        // Move the Marker B
-                        if (childKey === "1") {
-                            setMarkerB({
-                                lat: mouse.lat,
-                                lng: mouse.lng,
-                                ...mouse
-                            })
+                        if (markerDraggable) {
+                            // Move the Marker A
+                            if (childKey === "0") {
+                                setMarkerA({
+                                    lat: mouse.lat,
+                                    lng: mouse.lng,
+                                    ...mouse
+                                })
+                            }
+                            // Move the Marker B
+                            if (childKey === "1") {
+                                setMarkerB({
+                                    lat: mouse.lat,
+                                    lng: mouse.lng,
+                                    ...mouse
+                                })
+                            }
                         }
                     }}
                 >
-
-                    {/* <ImageOverLay key={0} lat={markerA.lat} lng={markerA.lng} /> */}
                     <MarkerA
                         key={0}
                         lat={markerA.lat}
