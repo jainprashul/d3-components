@@ -61,6 +61,7 @@ type Props = {
     mapZoomable?: boolean
     dataMarkers?: MarkerData[],
     selectedMarkerID?: string | number,
+    getMarkerData?: (data: MarkerData) => void,
 }
 
 const OverlayMap = ({
@@ -81,6 +82,7 @@ const OverlayMap = ({
     mapZoomable = true,
     dataMarkers = [],
     selectedMarkerID,
+    getMarkerData,
     apiKey
 }: Props) => {
 
@@ -197,7 +199,7 @@ const OverlayMap = ({
             });
 
             // load the markers from the data markers array 
-            loadDataMarkers(dataMarkers, selectedMarkerID);
+            loadDataMarkers(dataMarkers, selectedMarkerID, getMarkerData);
 
             setTimeout(() => {
                 rotateMap(1, _heading)
