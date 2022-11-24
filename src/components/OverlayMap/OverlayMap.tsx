@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import GoogleMapReact from 'google-map-react';
-import AutoCompleteBox from  '../shared/AutoCompleteBox';
+import AutoCompleteBox from '../shared/AutoCompleteBox';
 import { GmapApi } from '../../types/GmapApi';
 import { createOverlayClass, CustomOverlay } from './overlayClass';
-import { MAPSTATE, useMap } from '../shared/useMap';
+import { MAPSTATE, MarkerData, useMap } from '../shared/useMap';
 import { asset } from '../../assets'
 
 export type Location = {
@@ -59,6 +59,8 @@ type Props = {
     mapDraggable?: boolean
     markerDraggable?: boolean
     mapZoomable?: boolean
+    dataMarkers?: MarkerData[],
+    selectedMarkerID?: string | number,
 }
 
 const OverlayMap = ({
@@ -77,6 +79,8 @@ const OverlayMap = ({
     mapDraggable: _draggable = true,
     markerDraggable = true,
     mapZoomable = true,
+    dataMarkers = [],
+    selectedMarkerID,
     apiKey
 }: Props) => {
 
@@ -85,7 +89,7 @@ const OverlayMap = ({
         zoom, setZoom,
         mapDraggable, setMapDraggable,
         _generateAddress, updatePlace,
-        rotateMap,
+        rotateMap, loadDataMarkers,
     } = useMap(center, _zoom, _heading, _draggable)
 
     const [markerA, setMarkerA] = React.useState<Location>(_markerA)
@@ -192,6 +196,9 @@ const OverlayMap = ({
                 isFractionalZoomEnabled: true,
             });
 
+            // load the markers from the data markers array 
+            loadDataMarkers(dataMarkers, selectedMarkerID);
+
             setTimeout(() => {
                 rotateMap(1, _heading)
             }, 500)
@@ -210,7 +217,7 @@ const OverlayMap = ({
     useEffect(() => {
         if (map) {
             AddOverlay(map, imgSrc)
-            if((!markerDraggable && !_draggable) && overlay?.bounds){
+            if ((!markerDraggable && !_draggable) && overlay?.bounds) {
                 console.log('setting bounds', overlay.bounds);
                 // map.instance.fitBounds(overlay.bounds)
             }
@@ -220,7 +227,7 @@ const OverlayMap = ({
 
     useEffect(() => {
         setMapDraggable(_draggable)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [_draggable])
 
     // handles the updating the overlay when the markers are changed
@@ -253,11 +260,10 @@ const OverlayMap = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [center, markerA, markerB, zoom])
 
-
     const MarkerA = ({ lat, lng }: {
         lat: number,
         lng: number
-    }) => <span className={markerDraggable ? `marker` : `marker hidden` }></span>
+    }) => <span className={markerDraggable ? `marker` : `marker hidden`}></span>
 
     return (
         <div style={{ height: '100%', margin: '2px', width: xdim }}>

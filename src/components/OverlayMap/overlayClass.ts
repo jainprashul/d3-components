@@ -45,7 +45,7 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
             this.div.style.borderWidth = "0px";
             this.div.style.position = "absolute";
             this.div.style.cursor = "move";
-            this.div.style.opacity = "0.6";
+            this.div.style.opacity = "1";
             // Create the img element and attach it to the div.
             const img = document.createElement("img");
 

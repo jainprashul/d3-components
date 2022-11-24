@@ -7,6 +7,12 @@ type Location = {
     lng: number
 }
 
+export type MarkerData = {
+    id: string | number,
+    location: Location,
+    title: string,
+    icon?: string
+}
 export type MAPSTATE = {
     apiLoaded: boolean,
     instance: google.maps.Map
@@ -14,7 +20,7 @@ export type MAPSTATE = {
     ref: HTMLElement | null
 }
 
-export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag? : boolean) => {
+export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: boolean) => {
 
     const [map, setMap] = React.useState<MAPSTATE | null>(null)
 
@@ -129,6 +135,42 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag? : boo
         map?.instance.setHeading(angle);
     }
 
+    function loadDataMarkers(data: MarkerData[], selectedMarkerID?: string | number, callback = (data: MarkerData) => {
+        console.log(data)
+    }) {
+        if (map) {
+            // const defaultIcon = selectedMarkerID ? './imgs/marker.svg' : './imgs/marker-selected.svg'
+            // load the markers from the data markers array 
+            const dataMarkers = data.map((marker) => {
+                const icon = selectedMarkerID === marker.id ? asset.pointerGreen : asset.pointerGrey
+                const markerInstance = new map.api.Marker({
+                    position: marker.location,
+                    title: marker.title,
+                    map: map.instance,
+                    draggable: selectedMarkerID === marker.id,
+                    icon: {
+                        url: marker.icon ?? icon,
+                        scaledSize: new map.api.Size(30, 30),
+                        anchor: new map.api.Point(15, 28),
+                        origin: new map.api.Point(0, 0),
+                    },
+                });
+                markerInstance.addListener("dragend", () => {
+                    const { lat, lng } = markerInstance.getPosition()!.toJSON();
+                    let data = {
+                        id: marker.id,
+                        location: { lat, lng },
+                        title: marker.title,
+                    }
+                    callback(data)
+                });
+                return markerInstance;
+            })
+            return dataMarkers
+        }
+        return null;
+    }
+
     return {
         map, setMap,
         center, setCenter,
@@ -139,6 +181,7 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag? : boo
         updatePlace,
         _generateAddress,
         searchAddress,
-        rotateMap
+        rotateMap,
+        loadDataMarkers
     }
 };
