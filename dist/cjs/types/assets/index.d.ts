@@ -5,4 +5,6 @@ export declare const asset: {
     pointer: any;
     pin: any;
     floorPlan: string;
+    pointerGreen: any;
+    pointerGrey: any;
 };
