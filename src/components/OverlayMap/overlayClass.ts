@@ -8,7 +8,7 @@ export interface CustomOverlay extends google.maps.OverlayView {
     updateBounds(bounds: google.maps.LatLngBounds): void;
     hide(): void;
     rotate (angle: number): void;
-    toggleOpacity (): void;
+    toggleOpacity (): string | undefined;
     changeAngle (direction? : number, delta? : number): void;
     opacity(opacity: number): void;
     show(): void;
@@ -23,9 +23,9 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
     * the bounds of the image, and a reference to the map.
     */
     return class CustomOverlay extends Overlay {
-         bounds: google.maps.LatLngBounds;
-         image: string;
-         div?: HTMLElement;
+        bounds: google.maps.LatLngBounds;
+        image: string;
+        div?: HTMLElement;
 
         constructor(bounds: google.maps.LatLngBounds, image: string) {
             super();
@@ -45,7 +45,7 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
             this.div.style.borderWidth = "0px";
             this.div.style.position = "absolute";
             this.div.style.cursor = "move";
-            this.div.style.opacity = "1";
+            this.div.style.opacity = opts.opacity ?? "1";
             // Create the img element and attach it to the div.
             const img = document.createElement("img");
 
@@ -85,19 +85,20 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
             )!;
 
             // console.log('dir', sw, ne)
-            opts.setMarkerA({
-                lat: this.bounds.getSouthWest().lat(),
-                lng: this.bounds.getSouthWest().lng(),
-                x: sw.x,
-                y: sw.y,
-            })
+            // disabling this for now due to rendering issues
+            // opts.setMarkerA({
+            //     lat: this.bounds.getSouthWest().lat(),
+            //     lng: this.bounds.getSouthWest().lng(),
+            //     x: sw.x,
+            //     y: sw.y,
+            // })
 
-            opts.setMarkerB({
-                lat: this.bounds.getNorthEast().lat(),
-                lng: this.bounds.getNorthEast().lng(),
-                x: ne.x,
-                y: ne.y,
-            })
+            // opts.setMarkerB({
+            //     lat: this.bounds.getNorthEast().lat(),
+            //     lng: this.bounds.getNorthEast().lng(),
+            //     x: ne.x,
+            //     y: ne.y,
+            // })
 
             // Resize the image's div to fit the indicated dimensions.
             if (this.div) {
@@ -139,10 +140,12 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
             if (this.div) {
                 const img = this.div
                 const opacity = parseFloat(img.style.opacity) || 0;
-                img.style.opacity = (opacity + 0.2).toString()
+                const updatedVal = (opacity + 0.2).toString();
+                img.style.opacity = updatedVal
                 if (opacity >= 1) {
                     img.style.opacity = "0.2"
                 }
+                return updatedVal
             }
         }
 

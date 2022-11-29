@@ -98,6 +98,7 @@ const OverlayMap = ({
     const [markerB, setMarkerB] = React.useState<Location>(_markerB)
 
     const [overlay, setOverlay] = React.useState<CustomOverlay | null>(null)
+    const [opacity, setOpacity] = React.useState<string>('0.6')
 
     function AddOverlay(map: MAPSTATE, imgSrc: string) {
         // if any overlay exists, remove it
@@ -114,6 +115,7 @@ const OverlayMap = ({
         const OverlayClass = createOverlayClass(map!.api, {
             setMarkerA,
             setMarkerB,
+            opacity: opacity,
         })
 
         const Overlay = new OverlayClass(bounds, imgSrc);
@@ -156,9 +158,10 @@ const OverlayMap = ({
 
         // click and hold to rotate
         let rotateInterval: any;
-        rotateLeftBtn.addEventListener("mousedown", () => {
+        rotateLeftBtn.addEventListener("mousedown", (evt) => {
+            // for the precision of rotation, use shift key
             rotateInterval = setInterval(() => {
-                rotateMap(-1)
+                evt.shiftKey ? rotateMap(-0.1) : rotateMap(-1)
             }, 50)
         });
         rotateLeftBtn.addEventListener("mouseup", () => {
@@ -168,9 +171,10 @@ const OverlayMap = ({
             clearInterval(rotateInterval)
         });
 
-        rotateRightBtn.addEventListener("mousedown", () => {
+        rotateRightBtn.addEventListener("mousedown", (evt) => {
+            // for the precision of rotation, use shift key
             rotateInterval = setInterval(() => {
-                rotateMap(1)
+                evt.shiftKey ? rotateMap(0.1) : rotateMap(1)
             }, 50)
         });
         rotateRightBtn.addEventListener("mouseup", () => {
@@ -182,7 +186,8 @@ const OverlayMap = ({
         });
 
         toggleButton.addEventListener("click", () => {
-            overlay?.toggleOpacity();
+            const val = overlay?.toggleOpacity();
+            val && setOpacity(val);
         });
 
         map.instance.controls[google.maps.ControlPosition.TOP_RIGHT].push(resetBtn);
@@ -203,7 +208,7 @@ const OverlayMap = ({
 
             setTimeout(() => {
                 rotateMap(1, _heading)
-            }, 500)
+            }, 1500)
 
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
