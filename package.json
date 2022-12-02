@@ -1,7 +1,7 @@
 {
   "name": "@highway-9-networks/d3-components",
   "publishConfig": {
-    "access": "public"
+    "registry": "https://npm.pkg.github.com/@Highway9-Networks"
   },
   "version": "1.0.35",
   "description": "React D3 Components",
