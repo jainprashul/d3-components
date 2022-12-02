@@ -1,9 +1,9 @@
 {
-  "name": "@jainprashul/d3-components",
+  "name": "@highway-9-networks/d3-components",
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.0.34",
+  "version": "1.0.35",
   "description": "React D3 Components",
   "keywords": [
     "react",
@@ -50,5 +50,13 @@
   "files": [
     "dist",
     "src"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Highway9-Networks/d3-components.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Highway9-Networks/d3-components/issues"
+  },
+  "homepage": "https://github.com/Highway9-Networks/d3-components#readme"
 }
