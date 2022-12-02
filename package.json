@@ -1,5 +1,5 @@
 {
-  "name": "@highway-9-networks/d3-components",
+  "name": "d3-components",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@Highway9-Networks"
   },
