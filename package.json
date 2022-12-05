@@ -3,7 +3,7 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@Highway9-Networks"
   },
-  "version": "1.0.35",
+  "version": "1.0.36",
   "description": "React D3 Components",
   "keywords": [
     "react",
@@ -17,7 +17,7 @@
     "rollup": "rollup -c",
     "clean": "npx rimraf dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run rollup && npm publish"
+    "build": "npm run rollup && npm version patch && npm publish"
   },
   "author": "Prashul Jain <jainprashul@gmail.com>",
   "license": "ISC",
