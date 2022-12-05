@@ -207,8 +207,8 @@ const OverlayMap = ({
             loadDataMarkers(dataMarkers, selectedMarkerID, getMarkerData);
 
             setTimeout(() => {
-                rotateMap(1, _heading)
-            }, 1500)
+                map.instance.setHeading(_heading)
+            }, 500)
 
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
