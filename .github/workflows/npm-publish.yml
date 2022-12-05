@@ -19,7 +19,9 @@ jobs:
           registry-url: https://npm.pkg.github.com/
           scope: '@Highway9-Networks'
       - run: npm install
+      - run: git stash
       - run: npm version patch
+      - run: git stash pop
       - run: npm run build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
