@@ -20,6 +20,8 @@ jobs:
           scope: '@Highway9-Networks'
       - run: npm install
       - run: git stash
+      - run: git config --global user.email "jainprashul@gmail.com"
+      - run: git config --global user.name "jainprashul"
       - run: npm version patch
       - run: git stash pop
       - run: npm run build
