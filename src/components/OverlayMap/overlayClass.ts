@@ -191,7 +191,7 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
         }
 
         reset() {
-            if (this.div) {
+            if (this.div && opts.planDraggable) {
                 this.div.style.transform = `rotate(0deg)`;
                 // reset the projection to the center of the map 
                 const overlayProjection = this.getProjection();

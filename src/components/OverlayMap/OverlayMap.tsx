@@ -57,7 +57,7 @@ type Props = {
     showAddressInput?: boolean
     apiKey: string
     mapDraggable?: boolean
-    markerDraggable?: boolean
+    planDraggable?: boolean
     mapZoomable?: boolean
     dataMarkers?: MarkerData[],
     selectedMarkerID?: string | number,
@@ -78,7 +78,7 @@ const OverlayMap = ({
     size = 'medium',
     showAddressInput = true,
     mapDraggable: _draggable = true,
-    markerDraggable = true,
+    planDraggable = true,
     mapZoomable = true,
     dataMarkers = [],
     selectedMarkerID,
@@ -99,6 +99,7 @@ const OverlayMap = ({
 
     const [overlay, setOverlay] = React.useState<CustomOverlay | null>(null)
     const [opacity, setOpacity] = React.useState<string>('0.6')
+    const selectedMarkerInstance = React.useRef<google.maps.Marker>()
 
     function AddOverlay(map: MAPSTATE, imgSrc: string) {
         // if any overlay exists, remove it
@@ -116,6 +117,7 @@ const OverlayMap = ({
             setMarkerA,
             setMarkerB,
             opacity: opacity,
+            planDraggable : planDraggable,
         })
 
         const Overlay = new OverlayClass(bounds, imgSrc);
@@ -148,6 +150,9 @@ const OverlayMap = ({
         // reset button
         resetBtn.addEventListener("click", () => {
             overlay?.reset();
+            if(!planDraggable){
+                resetMarkerToCenter()
+            }
         });
 
         // reset button on double click
@@ -196,6 +201,13 @@ const OverlayMap = ({
         map.instance.controls[google.maps.ControlPosition.RIGHT_CENTER].push(rotateRightBtn);
     }
 
+    const resetMarkerToCenter = () => {
+        if (selectedMarkerInstance.current) {
+            const center = map?.instance.getCenter()
+            selectedMarkerInstance.current.setPosition(center)
+        }
+    }
+
     useEffect(() => {
         if (map) {
             // enable fractional zoom
@@ -224,13 +236,13 @@ const OverlayMap = ({
     useEffect(() => {
         if (map) {
             AddOverlay(map, imgSrc)
-            if ((!markerDraggable && !_draggable) && overlay?.bounds) {
+            if ((!planDraggable && !_draggable) && overlay?.bounds) {
                 console.log('setting bounds', overlay.bounds);
                 // map.instance.fitBounds(overlay.bounds)
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [imgSrc, markerDraggable, mapDraggable, map])
+    }, [imgSrc, planDraggable, mapDraggable, map])
 
     useEffect(() => {
         setMapDraggable(_draggable)
@@ -270,7 +282,7 @@ const OverlayMap = ({
     const MarkerA = ({ lat, lng }: {
         lat: number,
         lng: number
-    }) => <span className={markerDraggable ? `marker` : `marker hidden`}></span>
+    }) => <span className={planDraggable ? `marker` : `marker hidden`}></span>
 
     return (
         <div style={{ height: '100%', margin: '2px', width: xdim }}>
@@ -327,14 +339,14 @@ const OverlayMap = ({
                     }}
                     options={{ controlSize: 20, mapId: "90f87356969d889c", heading: _heading, rotateControl: true, zoomControl: _draggable, fullscreenControl: false }}
                     onChildMouseDown={(childKey, childProps, mouse) => {
-                        if (markerDraggable) {
+                        if (planDraggable) {
                             setMapDraggable(false)
                         }
                         // console.log("Mouse Down",  childKey, childProps, mouse)
                     }}
                     onChildMouseUp={(childKey, childProps, mouse) => {
                         // console.log("Child Click UP", childKey, childProps, mouse)
-                        if (markerDraggable) {
+                        if (planDraggable) {
                             setMapDraggable(true)
                         }
                     }}
@@ -343,7 +355,7 @@ const OverlayMap = ({
                     }}
                     onChildMouseMove={(childKey, childProps, mouse) => {
                         // console.log("Child Mouse Move", childKey, mouse)
-                        if (markerDraggable) {
+                        if (planDraggable) {
                             // Move the Marker A
                             if (childKey === "0") {
                                 setMarkerA({

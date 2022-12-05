@@ -138,6 +138,7 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: bool
     function loadDataMarkers(data: MarkerData[], selectedMarkerID?: string | number, callback = (data: MarkerData) => {
         console.log(data)
     }) {
+        let selectedMarker: google.maps.Marker | undefined;
         if (map) {
             // const defaultIcon = selectedMarkerID ? './imgs/marker.svg' : './imgs/marker-selected.svg'
             // load the markers from the data markers array 
@@ -147,14 +148,23 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: bool
                     position: marker.location,
                     title: marker.title,
                     map: map.instance,
+                    label: {
+                        text: marker.title,
+                        fontSize: "10px",
+                        fontWeight: "bold",
+                    },
                     draggable: selectedMarkerID === marker.id,
                     icon: {
                         url: marker.icon ?? icon,
                         scaledSize: new map.api.Size(30, 30),
                         anchor: new map.api.Point(15, 28),
                         origin: new map.api.Point(0, 0),
+                        labelOrigin: new map.api.Point(0, -10),
                     },
                 });
+                if (selectedMarkerID === marker.id) {
+                    selectedMarker = markerInstance
+                }
                 markerInstance.addListener("dragend", () => {
                     const { lat, lng } = markerInstance.getPosition()!.toJSON();
                     let data = {
@@ -166,9 +176,11 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: bool
                 });
                 return markerInstance;
             })
-            return dataMarkers
+            return {
+                dataMarkers,
+                selectedMarker
+            }
         }
-        return null;
     }
 
     return {
