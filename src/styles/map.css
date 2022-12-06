@@ -23,14 +23,15 @@
     background-color: black;
     border: 1px solid black;
     /* border-radius: 50%; */
-    opacity: 0.2;
+    opacity: 0.6;
     position: absolute;
     transform: translate(-50%, -50%);
     cursor: sw-resize;
   }
 
   .marker:hover {
-    opacity: 0.8;
+    opacity: 0.9;
+    scale: 1.2;
   }
   
   .hidden {
