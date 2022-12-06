@@ -31,6 +31,8 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: bool
     const [mapDraggable, setMapDraggable] = React.useState(mapDrag ?? true);
     const [currentLocation, setCurrentLocation] = React.useState<null | Location>(null);
 
+    const markers = React.useRef<google.maps.Marker[]>([])
+
     const fetchCurrentLocation = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
@@ -47,7 +49,11 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: bool
     }
     // get the current location of the user and show it on the map
     useEffect(() => {
+        // for every 30 seconds check if the user location has changed
+        const interval = setInterval(() => {
         fetchCurrentLocation();
+        }, 60000);
+        return () => clearInterval(interval);
     }, []);
 
     React.useMemo(() => {
@@ -140,10 +146,13 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: bool
     }) {
         let selectedMarker: google.maps.Marker | undefined;
         if (map) {
-            // const defaultIcon = selectedMarkerID ? './imgs/marker.svg' : './imgs/marker-selected.svg'
+            // remove all the markers from the map before adding the new ones
+            markers.current.forEach((marker) => {
+                marker.setMap(null)
+            })
             // load the markers from the data markers array 
             const dataMarkers = data.map((marker) => {
-                const icon = selectedMarkerID === marker.id ? asset.pointerGreen : asset.pointerGrey
+                const icon = selectedMarkerID === marker.id ? asset.pointerGreen : asset.pointerGrey;
                 const markerInstance = new map.api.Marker({
                     position: marker.location,
                     title: marker.title,
@@ -176,6 +185,8 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: bool
                 });
                 return markerInstance;
             })
+            
+            markers.current = dataMarkers
             return {
                 dataMarkers,
                 selectedMarker
