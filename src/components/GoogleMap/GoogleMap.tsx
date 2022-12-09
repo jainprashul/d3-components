@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import GoogleMapReact from 'google-map-react'
 import AutoCompleteBox from '../shared/AutoCompleteBox'
 import { GmapApi } from '../../types/GmapApi'
-import { MarkerData, useMap } from '../shared/useMap'
+import { MAPSTATE, MarkerData, useMap } from '../shared/useMap'
 
 export type Location = {
     lat: number,
@@ -28,9 +28,10 @@ type Props = {
     width?: number
     showAddressInput?: boolean
     mapDraggable?: boolean
-    mapFunctions?: (map: GmapApi) => void
+    mapFunctions?: (map: MAPSTATE) => void
     markers?: MarkerData[],
-    markerDragable?: boolean
+    markerDragable?: boolean,
+    children?: React.ReactNode,
 }
 
 const GoogleMap = ({
@@ -45,6 +46,8 @@ const GoogleMap = ({
     showAddressInput = true,
     markerDragable = true,
     markers = [],
+    mapFunctions,
+    children,
 }: Props) => {
 
     useEffect(() => {
@@ -61,6 +64,14 @@ const GoogleMap = ({
         center, setCenter } = useMap(_center, _zoom, _mapDrag)
 
     useEffect(() => {
+        if (map) {
+            // pass the map instance to the parent component if needed
+            mapFunctions && mapFunctions(map)
+        }
+    }, [map])
+
+
+    useEffect(() => {
         if (!map) return
         getMapData({
             center: center!,
@@ -68,7 +79,7 @@ const GoogleMap = ({
             currentLocation: currentLocation!,
             heading: map.instance.getHeading(),
         })
-    }, [center, map , currentLocation, zoom])
+    }, [center, map, currentLocation, zoom])
 
     // load markers
     useEffect(() => {
@@ -77,20 +88,23 @@ const GoogleMap = ({
     }, [map, markers])
 
     return (
-        <div className="gmap" style={{
-            height: `${height}px`,
-            width: `${width}px`,
-            margin: '2px',
-        }}>
+        <div className="gmap" style={{ height: `100%`, width: width, margin: '2px' }}>
             {
-                (showAddressInput && map) && (
-                    <AutoCompleteBox map={map} updatePlace={updatePlace} />
+                (showAddressInput && map?.apiLoaded) && (
+                    <div style={{
+                        display: 'flex',
+                        gap: '5px',
+                    }}>
+                        <AutoCompleteBox map={map} updatePlace={updatePlace} />
+                        {children}
+                    </div>
                 )
             }
             <div style={{
                 height: showAddressInput ? height - 34 : height,
                 width: `${width}px`,
                 border: '1px solid #ccc',
+                marginTop: '4px',
             }}>
                 {
                     currentLocation && (<div style={{ height: '100%', width: '100%' }}>
@@ -100,7 +114,7 @@ const GoogleMap = ({
                                 libraries: ['places'],
                             }}
                             draggable={mapDraggable}
-                            center={center || currentLocation}
+                            center={center ?? currentLocation}
                             zoom={zoom}
                             yesIWantToUseGoogleMapApiInternals
                             onGoogleApiLoaded={({ map, maps: mapAPI, ref }) => {

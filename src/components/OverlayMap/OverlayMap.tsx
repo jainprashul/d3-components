@@ -65,7 +65,8 @@ type Props = {
     fullscreenControl?: boolean,
     selectedMarkerID?: string | number,
     getMarkerData?: (data: MarkerData) => void,
-    mapFunctions?: (map: MAPSTATE) => void
+    mapFunctions?: (map: MAPSTATE) => void,
+    children?: React.ReactNode
 }
 
 const OverlayMap = ({
@@ -90,6 +91,7 @@ const OverlayMap = ({
     selectedMarkerID,
     getMarkerData,
     mapFunctions,
+    children,
     apiKey
 }: Props) => {
 
@@ -329,6 +331,7 @@ const OverlayMap = ({
                         gap: '5px',
                     }}>
                         <AutoCompleteBox map={map} updatePlace={updatePlace} />
+                        {children}
                     </div>
                 )
             }
