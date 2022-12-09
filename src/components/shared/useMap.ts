@@ -10,7 +10,7 @@ type Location = {
 export type MarkerData = {
     id: string | number,
     location: Location,
-    title: string,
+    title?: string,
     icon?: string
 }
 export type MAPSTATE = {
@@ -20,7 +20,7 @@ export type MAPSTATE = {
     ref: HTMLElement | null
 }
 
-export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: boolean) => {
+export const useMap = (Center?: Location, Zoom = 10, mapDrag?: boolean) => {
 
     const [map, setMap] = React.useState<MAPSTATE | null>(null)
 
@@ -49,7 +49,8 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: bool
     }
     // get the current location of the user and show it on the map
     useEffect(() => {
-        // for every 30 seconds check if the user location has changed
+        // for every 60 seconds check if the user location has changed
+        fetchCurrentLocation();
         const interval = setInterval(() => {
         fetchCurrentLocation();
         }, 60000);
@@ -143,7 +144,7 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: bool
 
     function loadDataMarkers(data: MarkerData[], selectedMarkerID?: string | number, callback = (data: MarkerData) => {
         console.log(data)
-    }) {
+    }, draggable = false) {
         let selectedMarker: google.maps.Marker | undefined;
         if (map) {
             // remove all the markers from the map before adding the new ones
@@ -152,17 +153,18 @@ export const useMap = (Center?: Location, Zoom = 10, Heading = 0, mapDrag?: bool
             })
             // load the markers from the data markers array 
             const dataMarkers = data.map((marker) => {
-                const icon = selectedMarkerID === marker.id ? asset.pointerGreen : asset.pointerGrey;
+                const isDraggable = selectedMarkerID ? selectedMarkerID === marker.id : draggable 
+                const icon = isDraggable ? asset.pointerGreen : asset.pointerGrey;
                 const markerInstance = new map.api.Marker({
                     position: marker.location,
                     title: marker.title,
                     map: map.instance,
-                    label: {
+                    label: marker.title && {
                         text: marker.title,
                         fontSize: "10px",
                         fontWeight: "bold",
                     },
-                    draggable: selectedMarkerID === marker.id,
+                    draggable: isDraggable,
                     icon: {
                         url: marker.icon ?? icon,
                         scaledSize: new map.api.Size(30, 30),

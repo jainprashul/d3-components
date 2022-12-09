@@ -19,6 +19,7 @@ export type MapData = {
     zoom: number,
     markerA: Location,
     markerB: Location,
+    markerCenter?: Location,
     heading?: number,
 }
 
@@ -53,7 +54,6 @@ type Props = {
     imgSrc?: string,
     markerA?: Location,
     markerB?: Location,
-    size?: 'small' | 'medium' | 'large'
     showAddressInput?: boolean
     apiKey: string
     mapDraggable?: boolean
@@ -61,8 +61,11 @@ type Props = {
     planDraggable?: boolean
     mapZoomable?: boolean
     dataMarkers?: MarkerData[],
+    showButtons?: boolean,
+    fullscreenControl?: boolean,
     selectedMarkerID?: string | number,
     getMarkerData?: (data: MarkerData) => void,
+    mapFunctions?: (map: MAPSTATE) => void
 }
 
 const OverlayMap = ({
@@ -76,15 +79,17 @@ const OverlayMap = ({
     zoom: _zoom = defaultData.zoom,
     imgSrc = asset.floorPlan,
     getMapData,
-    size = 'medium',
     showAddressInput = true,
     mapDraggable: _draggable = true,
     planDraggable = true,
     mapZoomable = true,
     mapRotateable = true,
+    showButtons = true,
+    fullscreenControl = true,
     dataMarkers = [],
     selectedMarkerID,
     getMarkerData,
+    mapFunctions,
     apiKey
 }: Props) => {
 
@@ -94,7 +99,7 @@ const OverlayMap = ({
         mapDraggable, setMapDraggable,
         _generateAddress, updatePlace,
         rotateMap, loadDataMarkers,
-    } = useMap(center, _zoom, _heading, _draggable)
+    } = useMap(center, _zoom, _draggable)
 
     const [markerA, setMarkerA] = React.useState<Location>(_markerA)
     const [markerB, setMarkerB] = React.useState<Location>(_markerB)
@@ -102,6 +107,7 @@ const OverlayMap = ({
     const [overlay, setOverlay] = React.useState<CustomOverlay | null>(null)
     const [opacity, setOpacity] = React.useState<string>('0.6')
     const selectedMarkerInstance = React.useRef<google.maps.Marker>()
+    const boundCenter = React.useRef<Location>(center)
 
     function AddOverlay(map: MAPSTATE, imgSrc: string) {
         // if any overlay exists, remove it
@@ -119,7 +125,7 @@ const OverlayMap = ({
             setMarkerA,
             setMarkerB,
             opacity: opacity,
-            planDraggable : planDraggable,
+            planDraggable: planDraggable,
         })
 
         const Overlay = new OverlayClass(bounds, imgSrc);
@@ -140,36 +146,44 @@ const OverlayMap = ({
         map.instance.controls.forEach((control) => {
             control.clear()
         })
-        if (!mapDraggable) return;
+
+        if (!showButtons || !mapDraggable) return;
+
         const toggleButton = document.createElement("button");
-        toggleButton.innerHTML = '<span class="material-symbols-outlined">opacity</span>';
+        toggleButton.innerHTML = '<span title="Change Opacity" class="material-symbols-outlined">opacity</span>';
         toggleButton.classList.add("custom-map-control-button");
 
         const resetBtn = document.createElement("button");
-        resetBtn.innerHTML = '<span class="material-symbols-outlined">lock_reset</span>';
+        resetBtn.innerHTML = '<span title="Reset to Center" class="material-symbols-outlined">lock_reset</span>';
         resetBtn.classList.add("custom-map-control-button");
 
         const rotateLeftBtn = document.createElement("button");
-        rotateLeftBtn.innerHTML = '<span class="material-symbols-outlined">rotate_left</span>';;
+        rotateLeftBtn.innerHTML = '<span title="Rotate Left | Hold Shift for precise rotation" class="material-symbols-outlined">rotate_left</span>';
         rotateLeftBtn.classList.add("custom-map-control-button");
 
         const rotateRightBtn = document.createElement("button");
-        rotateRightBtn.innerHTML = '<span class="material-symbols-outlined">rotate_right</span>';;
+        rotateRightBtn.innerHTML = '<span title="Rotate Right | Hold Shift for precise rotation" class="material-symbols-outlined">rotate_right</span>';;
         rotateRightBtn.classList.add("custom-map-control-button");
 
         // reset button
         resetBtn.addEventListener("click", () => {
-            overlay?.reset();
-            if(!planDraggable){
+            overlay?.reset({
+                width: xdim * 0.8,
+                height: ydim * 0.8,
+            });
+            if (!planDraggable) {
                 resetMarkerToCenter()
             }
         });
 
         // reset button on double click
-        if (mapRotateable){
+        if (mapRotateable) {
             resetBtn.addEventListener("dblclick", () => {
                 map.instance.setHeading(0);
-                overlay?.reset();
+                overlay?.reset({
+                    width: xdim * 0.8,
+                    height: ydim * 0.8,
+                });
             });
         }
 
@@ -210,38 +224,40 @@ const OverlayMap = ({
         map.instance.controls[google.maps.ControlPosition.TOP_RIGHT].push(resetBtn);
         map.instance.controls[google.maps.ControlPosition.TOP_RIGHT].push(toggleButton);
 
-        if (mapRotateable){
+        if (mapRotateable) {
             map.instance.controls[google.maps.ControlPosition.LEFT_CENTER].push(rotateLeftBtn);
             map.instance.controls[google.maps.ControlPosition.RIGHT_CENTER].push(rotateRightBtn);
         }
-    } , [mapDraggable, mapRotateable, overlay, planDraggable, resetMarkerToCenter, rotateMap])
+    }, [mapDraggable, mapRotateable, overlay, planDraggable, resetMarkerToCenter, rotateMap])
+
 
     // if map changes, set the map options
     useEffect(() => {
-        if (map) {
-            // enable fractional zoom
-            map.instance.setOptions({
-                isFractionalZoomEnabled: true,
-            });
-            // set the map heading
-            setTimeout(() => {
-                map.instance.setHeading(_heading)
-            }, 500)
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        if (!map) return;
+        // enable fractional zoom
+        map.instance.setOptions({
+            isFractionalZoomEnabled: true,
+        });
+        // set the map heading
+        setTimeout(() => {
+            map.instance.setHeading(_heading)
+        }, 500)
+
+        // pass the map instance to the mapFunctions to be used by the parent component
+        mapFunctions && mapFunctions(map)
     }, [map])
 
     // if data marker changes, rerender the markers
     useEffect(() => {
         if (map) {
             // load the markers from the data markers array 
-        const { selectedMarker } = loadDataMarkers(dataMarkers, selectedMarkerID, getMarkerData)!;
-        // if a marker is selected, set the selectedMarkerInstance
-        if (selectedMarker) {
-            selectedMarkerInstance.current = selectedMarker;
+            const { selectedMarker } = loadDataMarkers(dataMarkers, selectedMarkerID, getMarkerData)!;
+            // if a marker is selected, set the selectedMarkerInstance
+            if (selectedMarker) {
+                selectedMarkerInstance.current = selectedMarker;
+            }
         }
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dataMarkers, map, selectedMarkerID])
 
     // if map changes, render the map controls
@@ -261,12 +277,10 @@ const OverlayMap = ({
                 // map.instance.fitBounds(overlay.bounds)
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [imgSrc, planDraggable, mapDraggable, map])
 
     useEffect(() => {
         setMapDraggable(_draggable)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [_draggable])
 
     // handles the updating the overlay when the markers are changed
@@ -275,6 +289,7 @@ const OverlayMap = ({
             let bounds = new map.api.LatLngBounds(new map.api.LatLng(markerA.lat, markerA.lng),
                 new map.api.LatLng(markerB.lat, markerB.lng))
             overlay.updateBounds(bounds)
+            boundCenter.current = bounds.getCenter().toJSON()
         }
     }, [markerA, markerB, overlay, map])
 
@@ -292,7 +307,8 @@ const OverlayMap = ({
                     zoom,
                     markerA,
                     markerB,
-                    heading: map.instance.getHeading() || 0
+                    markerCenter: boundCenter.current,
+                    heading: map.instance.getHeading() ?? 0
                 })
             })
         }
@@ -357,7 +373,9 @@ const OverlayMap = ({
                             overlay?.updateBounds(bounds)
                         }
                     }}
-                    options={{ controlSize: 20, mapId: "90f87356969d889c", heading: _heading, rotateControl: true, zoomControl: mapZoomable,  fullscreenControl: false }}
+                    options={{
+                        controlSize: 20, mapId: "90f87356969d889c", heading: _heading, rotateControl: true, zoomControl: mapZoomable, mapTypeControl: true, fullscreenControl: fullscreenControl
+                    }}
                     onChildMouseDown={(childKey, childProps, mouse) => {
                         if (planDraggable) {
                             setMapDraggable(false)
@@ -366,12 +384,12 @@ const OverlayMap = ({
                     }}
                     onChildMouseUp={(childKey, childProps, mouse) => {
                         // console.log("Child Click UP", childKey, childProps, mouse)
-                        if (planDraggable) {
+                        if (planDraggable && _draggable) {
                             setMapDraggable(true)
                         }
                     }}
                     onChildClick={(childKey, childProps) => {
-                        console.log("Child click ", childKey, childProps)
+                        // console.log("Child click ", childKey, childProps)
                     }}
                     onChildMouseMove={(childKey, childProps, mouse) => {
                         // console.log("Child Mouse Move", childKey, mouse)

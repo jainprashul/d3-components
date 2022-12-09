@@ -7,12 +7,15 @@ export interface CustomOverlay extends google.maps.OverlayView {
     onRemove(): void;
     updateBounds(bounds: google.maps.LatLngBounds): void;
     hide(): void;
-    rotate (angle: number): void;
-    toggleOpacity (): string | undefined;
-    changeAngle (direction? : number, delta? : number): void;
+    rotate(angle: number): void;
+    toggleOpacity(): string | undefined;
+    changeAngle(direction?: number, delta?: number): void;
     opacity(opacity: number): void;
     show(): void;
-    reset(): void;
+    reset(size?: {
+        width: number;
+        height: number;
+    }): void;
     toggleDOM(map: google.maps.Map): void;
 }
 
@@ -190,34 +193,34 @@ export function createOverlayClass(api: GmapApi, opts?: any) {
             }
         }
 
-        reset() {
-            if (this.div && opts.planDraggable) {
-                this.div.style.transform = `rotate(0deg)`;
-                // reset the projection to the center of the map 
-                const overlayProjection = this.getProjection();
+        reset(size = { width: 250, height: 250 }) {
+            if (!this.div || !opts.planDraggable) return;
 
-                const A = new api.Point(-150, 150);
-                const B = new api.Point(150, -150);
-                const locationA  = overlayProjection.fromDivPixelToLatLng(A)!;
-                const locationB = overlayProjection.fromDivPixelToLatLng(B)!;
-                const bounds = new api.LatLngBounds(locationA, locationB);
-                console.log('bounds', bounds)
-                this.updateBounds(bounds);
+            this.div.style.transform = `rotate(0deg)`;
+            // reset the projection to the center of the map 
+            const overlayProjection = this.getProjection();
 
-                opts.setMarkerA({
-                    lat: locationA.lat(),
-                    lng: locationA.lng(),
-                    x: A.x,
-                    y: A.y,
-                })
+            const A = new api.Point(-1 * size.width / 2, size.height / 2);
+            const B = new api.Point(size.width / 2, -1 * size.height / 2);
+            const locationA = overlayProjection.fromDivPixelToLatLng(A)!;
+            const locationB = overlayProjection.fromDivPixelToLatLng(B)!;
+            const bounds = new api.LatLngBounds(locationA, locationB);
+            console.log('bounds', bounds)
+            this.updateBounds(bounds);
 
-                opts.setMarkerB({
-                    lat: locationB.lat(),
-                    lng: locationB.lng(),
-                    x: B.x,
-                    y: B.y,
-                })
-            }
+            opts.setMarkerA({
+                lat: locationA.lat(),
+                lng: locationA.lng(),
+                x: A.x,
+                y: A.y,
+            })
+
+            opts.setMarkerB({
+                lat: locationB.lat(),
+                lng: locationB.lng(),
+                x: B.x,
+                y: B.y,
+            })
         }
 
         toggleDOM(map: google.maps.Map) {

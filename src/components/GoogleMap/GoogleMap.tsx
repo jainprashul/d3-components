@@ -2,33 +2,49 @@ import React, { useEffect } from 'react'
 import GoogleMapReact from 'google-map-react'
 import AutoCompleteBox from '../shared/AutoCompleteBox'
 import { GmapApi } from '../../types/GmapApi'
-import { useMap } from '../shared/useMap'
+import { MarkerData, useMap } from '../shared/useMap'
 
 export type Location = {
     lat: number,
     lng: number
 }
 
+type MapData = {
+    center: Location
+    zoom: number
+    heading?: number
+    currentLocation?: Location
+    markerLocation?: Location
+}
+
 type Props = {
     center?: Location
     zoom?: number
-    getCurrentLocation: (markers: Location) => void
+    heading?: number
+    getMapData: (data: MapData) => void
+    getMarkerData: (markers: MarkerData) => void
     apiKey: string
     height?: number
     width?: number
     showAddressInput?: boolean
-    showCurrentLocation?: boolean
+    mapDraggable?: boolean
+    mapFunctions?: (map: GmapApi) => void
+    markers?: MarkerData[],
+    markerDragable?: boolean
 }
 
 const GoogleMap = ({
     center: _center,
-    zoom = 11,
-    getCurrentLocation,
+    zoom: _zoom = 11,
+    getMapData,
+    getMarkerData,
     apiKey,
     height = 400,
     width = 400,
+    mapDraggable: _mapDrag = true,
     showAddressInput = true,
-    showCurrentLocation = true
+    markerDragable = true,
+    markers = [],
 }: Props) => {
 
     useEffect(() => {
@@ -40,16 +56,25 @@ const GoogleMap = ({
     }, [_center])
 
 
-    const { map, setMap, currentLocation,
-        mapDraggable, setMapDraggable, updatePlace, 
-        center, setCenter } = useMap(_center)
+    const { map, setMap, currentLocation, zoom, setZoom,
+        mapDraggable, setMapDraggable, updatePlace, loadDataMarkers,
+        center, setCenter } = useMap(_center, _zoom, _mapDrag)
 
     useEffect(() => {
-        if (center && map) {
-            getCurrentLocation(center)
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [center])
+        if (!map) return
+        getMapData({
+            center: center!,
+            zoom,
+            currentLocation: currentLocation!,
+            heading: map.instance.getHeading(),
+        })
+    }, [center, map , currentLocation, zoom])
+
+    // load markers
+    useEffect(() => {
+        if (!map) return
+        loadDataMarkers(markers, undefined, getMarkerData, markerDragable)
+    }, [map, markers])
 
     return (
         <div className="gmap" style={{
@@ -90,6 +115,7 @@ const GoogleMap = ({
                             onChange={({ center, zoom, bounds, marginBounds }) => {
                                 // console.log(center, zoom, bounds, marginBounds)
                                 setCenter(center)
+                                setZoom(zoom)
                             }}
                             options={{ mapTypeControl: true, controlSize: 20, clickableIcons: true }}
                             onChildMouseDown={(childKey, childProps, mouse) => {
