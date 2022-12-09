@@ -76,7 +76,7 @@ const CalibrateMap = ({
 
     const { map , setMap,
         zoom, setZoom,
-        mapDraggable , setMapDraggable , updatePlace, _generateAddress} = useMap(_center, _zoom, heading)
+        mapDraggable , setMapDraggable , updatePlace, _generateAddress} = useMap(_center, _zoom)
 
     const [markerA, setMarkerA] = React.useState<Location>(_markerA)
     const [markerB, setMarkerB] = React.useState<Location>(_markerB)
