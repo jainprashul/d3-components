@@ -18,6 +18,7 @@ export type MapData = {
     markerA: Location,
     markerB: Location,
     heading? : number
+    markerCenter?: Location,
 }
 
 let defaultData = {

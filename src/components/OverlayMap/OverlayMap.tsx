@@ -19,8 +19,8 @@ export type MapData = {
     zoom: number,
     markerA: Location,
     markerB: Location,
-    markerCenter?: Location,
     heading?: number,
+    markerCenter?: Location,
 }
 
 let defaultData = {

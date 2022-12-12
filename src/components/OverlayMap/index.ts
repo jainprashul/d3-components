@@ -1,1 +1,1 @@
-export {default , Location} from './OverlayMap';
+export {default , Location, MapData} from './OverlayMap';

@@ -1,1 +1,1 @@
-export { default , MapData } from './CalibrateMap';
+export { default , MapData, Location } from './CalibrateMap';
