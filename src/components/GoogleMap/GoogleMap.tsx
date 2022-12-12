@@ -15,6 +15,7 @@ type MapData = {
     heading?: number
     currentLocation?: Location
     markerLocation?: Location
+    address?: string
 }
 
 type Props = {
@@ -59,7 +60,7 @@ const GoogleMap = ({
     }, [_center])
 
 
-    const { map, setMap, currentLocation, zoom, setZoom,
+    const { map, setMap, currentLocation, zoom, setZoom, _generateAddress,
         mapDraggable, setMapDraggable, updatePlace, loadDataMarkers,
         center, setCenter } = useMap(_center, _zoom, _mapDrag)
 
@@ -72,13 +73,18 @@ const GoogleMap = ({
 
 
     useEffect(() => {
-        if (!map) return
-        getMapData({
-            center: center!,
-            zoom,
-            currentLocation: currentLocation!,
-            heading: map.instance.getHeading(),
-        })
+        async function updateData() {
+            if (!map) return
+            const addr = await _generateAddress(center?.lat!, center?.lng!)
+            getMapData({
+                center: center!,
+                zoom,
+                address : addr,
+                currentLocation: currentLocation!,
+                heading: map.instance.getHeading(),
+            })
+        }
+        updateData()
     }, [center, map, currentLocation, zoom])
 
     // load markers
