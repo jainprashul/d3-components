@@ -4,7 +4,8 @@ import { asset } from "../../assets";
 
 type Location = {
     lat: number,
-    lng: number
+    lng: number,
+    address?: string
 }
 
 export type MarkerData = {
@@ -52,7 +53,7 @@ export const useMap = (Center?: Location, Zoom = 10, mapDrag?: boolean) => {
         // for every 60 seconds check if the user location has changed
         fetchCurrentLocation();
         const interval = setInterval(() => {
-        fetchCurrentLocation();
+            fetchCurrentLocation();
         }, 60000);
         return () => clearInterval(interval);
     }, []);
@@ -153,7 +154,7 @@ export const useMap = (Center?: Location, Zoom = 10, mapDrag?: boolean) => {
             })
             // load the markers from the data markers array 
             const dataMarkers = data.map((marker) => {
-                const isDraggable = selectedMarkerID ? selectedMarkerID === marker.id : draggable 
+                const isDraggable = selectedMarkerID ? selectedMarkerID === marker.id : draggable
                 const icon = isDraggable ? asset.pointerGreen : asset.pointerGrey;
                 const markerInstance = new map.api.Marker({
                     position: marker.location,
@@ -176,18 +177,19 @@ export const useMap = (Center?: Location, Zoom = 10, mapDrag?: boolean) => {
                 if (selectedMarkerID === marker.id) {
                     selectedMarker = markerInstance
                 }
-                markerInstance.addListener("dragend", () => {
+                markerInstance.addListener("dragend", async () => {
                     const { lat, lng } = markerInstance.getPosition()!.toJSON();
+                    const address = await _generateAddress(lat, lng)
                     let data = {
                         id: marker.id,
-                        location: { lat, lng },
+                        location: { lat, lng, address },
                         title: marker.title,
                     }
                     callback(data)
                 });
                 return markerInstance;
             })
-            
+
             markers.current = dataMarkers
             return {
                 dataMarkers,

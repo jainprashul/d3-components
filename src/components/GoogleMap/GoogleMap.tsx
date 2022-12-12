@@ -6,7 +6,8 @@ import { MAPSTATE, MarkerData, useMap } from '../shared/useMap'
 
 export type Location = {
     lat: number,
-    lng: number
+    lng: number,
+    address?: string
 }
 
 type MapData = {
