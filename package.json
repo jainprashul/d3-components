@@ -3,7 +3,7 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@Highway9-Networks"
   },
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "React D3 Components",
   "keywords": [
     "react",
