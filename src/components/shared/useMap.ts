@@ -137,7 +137,7 @@ export const useMap = (Center?: Location, Zoom = 10, mapDrag?: boolean) => {
         });
     }
 
-    function rotateMap(direction = 1, delta = 2) {
+    function rotateMap(delta = 2, direction = 1) {
         let angle = map?.instance.getHeading() || 0
         angle = angle + (delta * direction)
         map?.instance.setHeading(angle);

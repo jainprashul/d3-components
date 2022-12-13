@@ -152,20 +152,25 @@ const OverlayMap = ({
         if (!showButtons || !mapDraggable) return;
 
         const toggleButton = document.createElement("button");
+        toggleButton.id = "toggleButton";
         toggleButton.innerHTML = '<span title="Change Opacity" class="material-symbols-outlined">opacity</span>';
         toggleButton.classList.add("custom-map-control-button");
 
         const resetBtn = document.createElement("button");
-        resetBtn.innerHTML = '<span title="Reset to Center" class="material-symbols-outlined">lock_reset</span>';
+        resetBtn.id = "resetBtn";
+        resetBtn.innerHTML = '<span title="Reset to Center" class="material-symbols-outlined">settings_backup_restore</span>';
         resetBtn.classList.add("custom-map-control-button");
 
         const rotateLeftBtn = document.createElement("button");
+        rotateLeftBtn.id = "rotateLeftBtn";
         rotateLeftBtn.innerHTML = '<span title="Rotate Left | Hold Shift for precise rotation" class="material-symbols-outlined">rotate_left</span>';
         rotateLeftBtn.classList.add("custom-map-control-button");
 
         const rotateRightBtn = document.createElement("button");
+        rotateRightBtn.id = "rotateRightBtn";
         rotateRightBtn.innerHTML = '<span title="Rotate Right | Hold Shift for precise rotation" class="material-symbols-outlined">rotate_right</span>';;
         rotateRightBtn.classList.add("custom-map-control-button");
+
 
         // reset button
         resetBtn.addEventListener("click", () => {
@@ -194,7 +199,7 @@ const OverlayMap = ({
         rotateLeftBtn.addEventListener("mousedown", (evt) => {
             // for the precision of rotation, use shift key
             rotateInterval = setInterval(() => {
-                evt.shiftKey ? rotateMap(-0.1) : rotateMap(-1)
+                evt.shiftKey ? rotateMap(0.1) : rotateMap(1)
             }, 50)
         });
         rotateLeftBtn.addEventListener("mouseup", () => {
@@ -207,7 +212,7 @@ const OverlayMap = ({
         rotateRightBtn.addEventListener("mousedown", (evt) => {
             // for the precision of rotation, use shift key
             rotateInterval = setInterval(() => {
-                evt.shiftKey ? rotateMap(0.1) : rotateMap(1)
+                evt.shiftKey ? rotateMap(-0.1) : rotateMap(-1)
             }, 50)
         });
         rotateRightBtn.addEventListener("mouseup", () => {
@@ -281,6 +286,13 @@ const OverlayMap = ({
         }
     }, [imgSrc, planDraggable, mapDraggable, map])
 
+    // if imgSrc changes, reset the overlay img to the center
+    useEffect(() => {
+        setTimeout(() => {
+        map?.instance.controls[google.maps.ControlPosition.TOP_RIGHT]?.getArray()?.find((el) => el.id === 'resetBtn')?.click()
+        }, 200)
+    }, [imgSrc])
+
     useEffect(() => {
         setMapDraggable(_draggable)
     }, [_draggable])
@@ -338,9 +350,8 @@ const OverlayMap = ({
             <div style={{
                 width: xdim,
                 height: showAddressInput ? ydim - 34 : ydim,
-                border: '1px solid black',
+                border: '1px solid #ccc',
                 marginTop: '4px',
-
             }}>
 
                 <GoogleMapReact
