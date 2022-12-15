@@ -59,12 +59,13 @@ type Props = {
     mapDraggable?: boolean
     mapRotateable?: boolean
     planDraggable?: boolean
+    markerDraggable?: boolean
     mapZoomable?: boolean
     dataMarkers?: MarkerData[],
     showButtons?: boolean,
     fullscreenControl?: boolean,
     selectedMarkerID?: string | number,
-    getMarkerData?: (data: MarkerData) => void,
+    getMarkerData?: (data: MarkerData, draggable?:boolean) => void,
     mapFunctions?: (map: MAPSTATE) => void,
     children?: React.ReactNode
 }
@@ -83,6 +84,7 @@ const OverlayMap = ({
     showAddressInput = true,
     mapDraggable: _draggable = true,
     planDraggable = true,
+    markerDraggable = true,
     mapZoomable = true,
     mapRotateable = true,
     showButtons = true,
@@ -140,6 +142,15 @@ const OverlayMap = ({
         if (selectedMarkerInstance.current) {
             const center = map?.instance.getCenter()
             selectedMarkerInstance.current.setPosition(center)
+            const data : MarkerData = {
+                id: selectedMarkerID!,
+                location: {
+                    lat: center?.lat() ?? 0,
+                    lng: center?.lng() ?? 0,
+                }, 
+                title: selectedMarkerInstance.current.getTitle() ?? '',
+            }
+            getMarkerData && getMarkerData(data)
         }
     }, [map?.instance])
 
@@ -175,8 +186,8 @@ const OverlayMap = ({
         // reset button
         resetBtn.addEventListener("click", () => {
             overlay?.reset({
-                width: xdim * 0.8,
-                height: ydim * 0.8,
+                width: xdim * 0.6,
+                height: ydim * 0.6,
             });
             if (!planDraggable) {
                 resetMarkerToCenter()
@@ -188,8 +199,8 @@ const OverlayMap = ({
             resetBtn.addEventListener("dblclick", () => {
                 map.instance.setHeading(0);
                 overlay?.reset({
-                    width: xdim * 0.8,
-                    height: ydim * 0.8,
+                    width: xdim * 0.6,
+                    height: ydim * 0.6,
                 });
             });
         }
@@ -258,14 +269,14 @@ const OverlayMap = ({
     useEffect(() => {
         if (map) {
             // load the markers from the data markers array 
-            const { selectedMarker } = loadDataMarkers(dataMarkers, selectedMarkerID, getMarkerData)!;
+            const { selectedMarker } = loadDataMarkers(dataMarkers, selectedMarkerID, markerDraggable, getMarkerData)!;
             // if a marker is selected, set the selectedMarkerInstance
             if (selectedMarker) {
                 selectedMarkerInstance.current = selectedMarker;
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dataMarkers, map, selectedMarkerID])
+    }, [dataMarkers, map, selectedMarkerID, markerDraggable])
 
     // if map changes, render the map controls
     useEffect(() => {

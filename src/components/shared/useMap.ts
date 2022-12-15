@@ -143,7 +143,7 @@ export const useMap = (Center?: Location, Zoom = 10, mapDrag?: boolean) => {
         map?.instance.setHeading(angle);
     }
 
-    function loadDataMarkers(data: MarkerData[], selectedMarkerID?: string | number, callback = (data: MarkerData) => {
+    function loadDataMarkers(data: MarkerData[], selectedMarkerID?: string | number, markerDraggable = true, callback = (data: MarkerData) => {
         console.log(data)
     }, draggable = false) {
         let selectedMarker: google.maps.Marker | undefined;
@@ -165,7 +165,7 @@ export const useMap = (Center?: Location, Zoom = 10, mapDrag?: boolean) => {
                         fontSize: "10px",
                         fontWeight: "bold",
                     },
-                    draggable: isDraggable,
+                    draggable: markerDraggable ? isDraggable : false,
                     icon: {
                         url: marker.icon ?? icon,
                         scaledSize: new map.api.Size(30, 30),
