@@ -91,7 +91,7 @@ const GoogleMap = ({
     // load markers
     useEffect(() => {
         if (!map) return
-        loadDataMarkers(markers, undefined, getMarkerData, markerDragable)
+        loadDataMarkers(markers, undefined, true, getMarkerData, markerDragable)
     }, [map, markers])
 
     return (
@@ -114,14 +114,14 @@ const GoogleMap = ({
                 marginTop: '4px',
             }}>
                 {
-                    currentLocation && (<div style={{ height: '100%', width: '100%' }}>
+                    (<div style={{ height: '100%', width: '100%' }}>
                         <GoogleMapReact
                             bootstrapURLKeys={{
                                 key: apiKey,
                                 libraries: ['places'],
                             }}
                             draggable={mapDraggable}
-                            center={center ?? currentLocation}
+                            center={center ?? currentLocation!}
                             zoom={zoom}
                             yesIWantToUseGoogleMapApiInternals
                             onGoogleApiLoaded={({ map, maps: mapAPI, ref }) => {
