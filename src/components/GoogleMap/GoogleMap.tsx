@@ -60,6 +60,11 @@ const GoogleMap = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [_center])
 
+    useEffect(() => {
+        if (map && _zoom) {
+            setZoom(_zoom)
+        }
+    } , [_zoom])
 
     const { map, setMap, currentLocation, zoom, setZoom, _generateAddress,
         mapDraggable, setMapDraggable, updatePlace, loadDataMarkers,
